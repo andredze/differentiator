@@ -30,6 +30,9 @@ typedef enum MathOperations
     OP_DIV,
     OP_SIN,
     OP_COS,
+    OP_TG,
+    OP_CTG,
+    OP_LN,
     OP_DEG
 } MathOp_t;
 
@@ -39,6 +42,7 @@ typedef struct OpCase
 {
     MathOp_t    code;
     const char* str;
+    int         args_count;
     const char* color;
     const char* fillcolor;
     const char* fontcolor;
@@ -48,13 +52,16 @@ typedef struct OpCase
 
 const OpCase_t OP_CASES_TABLE[] =
 {
-    [OP_ADD] = {OP_ADD, "+",   "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_SUB] = {OP_SUB, "-",   "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_MUL] = {OP_MUL, "*",   "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_DIV] = {OP_DIV, "/",   "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_SIN] = {OP_SIN, "sin", "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_COS] = {OP_COS, "cos", "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_DEG] = {OP_DEG, "^",   "#065f96ff", "#58bbf8ff", "#043351ff"}
+    [OP_ADD] = {OP_ADD, "+",   2, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_SUB] = {OP_SUB, "-",   2, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_MUL] = {OP_MUL, "*",   2, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_DIV] = {OP_DIV, "/",   2, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_SIN] = {OP_SIN, "sin", 1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_COS] = {OP_COS, "cos", 1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_TG]  = {OP_TG,  "tg",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_CTG] = {OP_CTG, "ctg", 1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_LN]  = {OP_LN,  "ln",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_DEG] = {OP_DEG, "^",   2, "#065f96ff", "#58bbf8ff", "#043351ff"}
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————

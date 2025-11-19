@@ -20,7 +20,7 @@ TreeErr_t TreeCheck(const Tree_t* tree,
     {
         PRINTERR("%s (TreeVerify not passed! Check \"tree.html\")", TREE_STR_ERRORS[verify_status]);
 
-        TreeDumpInfo_t dump_info = {verify_status, func, file, line};
+        // TreeDumpInfo_t dump_info = {verify_status, func, file, line};
 
         va_list args = {};
         va_start(args, fmt);

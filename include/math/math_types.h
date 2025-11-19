@@ -11,6 +11,7 @@ typedef struct VarCase
 {
     char*  str;
     size_t hash;
+    double value;
 } VarCase_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -32,7 +33,9 @@ typedef enum MathErr
     MATH_SUCCESS,
     MATH_NULL,
     MATH_ALLOC_ERROR,
-    MATH_TREE_ERROR
+    MATH_TREE_ERROR,
+    MATH_UNKNOWN_OP,
+    MATH_INVALID_INPUT
 } MathErr_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————

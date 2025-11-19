@@ -1,6 +1,7 @@
 #include "tree_commands.h"
 #include "data_read.h"
 #include "math_funcs.h"
+#include "math_eval.h"
 
 //------------------------------------------------------------------------------------------
 
@@ -14,6 +15,14 @@ int main()
     do {
         if (TreeReadData(&math_ctx, "data/data.txt"))
             break;
+
+        double result = 0.0;
+
+        if (MathEvaluate(&math_ctx, &result))
+            break;
+
+        printf("result = %lg\n", result);
+
     } while (0);
 
     if (MathCtxDtor(&math_ctx))

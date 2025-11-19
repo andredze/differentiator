@@ -25,7 +25,8 @@ SOURCES = src/main.cpp 						\
           src/tree/tree_commands.cpp 		\
           src/tree/tree_debug.cpp 			\
           src/colors.cpp					\
-		  src/math/math_funcs.cpp
+		  src/math/math_funcs.cpp			\
+		  src/math/math_eval.cpp
 
 ifdef DEBUG
 CXXFLAGS += -D TREE_DEBUG
