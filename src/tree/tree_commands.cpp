@@ -25,10 +25,10 @@ TreeErr_t TreeCheck(const Tree_t* tree,
         va_list args = {};
         va_start(args, fmt);
 
-        if (vTreeDump(tree, &dump_info, fmt, args))
-        {
-            return TREE_DUMP_ERROR;
-        }
+        // if (vTreeDump(tree, &dump_info, fmt, args))
+        // {
+        //     return TREE_DUMP_ERROR;
+        // }
 
         va_end(args);
     }

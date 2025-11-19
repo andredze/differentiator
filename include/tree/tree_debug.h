@@ -19,19 +19,19 @@ TreeErr_t TreeReadBufferDump(const char* buffer,
 
 MathErr_t MathVarsTableDump(const MathCtx_t* math_ctx, const char* fmt, ...);
 
-TreeErr_t TreeDump(const Tree_t*         tree,
+TreeErr_t TreeDump(MathCtx_t* math_ctx,
                    const TreeDumpInfo_t* dump_info,
                    const char* fmt, ...);
 
-TreeErr_t vTreeDump(const Tree_t*         tree,
+TreeErr_t vTreeDump(MathCtx_t* math_ctx,
                     const TreeDumpInfo_t* dump_info,
                     const char* fmt, va_list args);
 
 TreeErr_t TreeOpenLogFile(FILE** fp_ptr, int* calls_count_ptr, char* dest_log_dir);
 
-TreeErr_t TreeGraphDump(const Tree_t* tree,
-                        const char* image_name,
-                        const char* dot_dir);
+TreeErr_t TreeGraphDump(MathCtx_t* math_ctx,
+                        const char* graph_name,
+                        const char* log_dir);
 
 void SetGraphFilepaths(char*       dot_file_path,
                        char*       svg_file_path,
@@ -43,12 +43,12 @@ TreeErr_t TreeConvertGraphFile(const char* dot_file_path,
 
 void      DumpGraphTitle      (FILE* dot_file);
 void      TreeNodePrint       (const TreeNode_t* node          );
-TreeErr_t TreeNodeDump        (const TreeNode_t* node, FILE* fp);
-TreeErr_t DumpTreeNodeAndEdges(const TreeNode_t* node, FILE* fp);
+TreeErr_t TreeNodeDump        (const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx);
+TreeErr_t DumpTreeNodeAndEdges(const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx);
+int       DumpTreeSingleNode  (const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx);
+int       DumpTreeVarNode     (const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx);
 int       DumpTreeEdges       (const TreeNode_t* node, FILE* fp);
-int       DumpTreeSingleNode  (const TreeNode_t* node, FILE* fp);
 int       DumpTreeOpNode      (const TreeNode_t* node, FILE* fp);
-int       DumpTreeVarNode     (const TreeNode_t* node, FILE* fp);
 int       DumpTreeNumNode     (const TreeNode_t* node, FILE* fp);
 int       SetDirectories      (char* log_filename, char* log_dir);
 

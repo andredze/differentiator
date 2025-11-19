@@ -61,14 +61,14 @@ int SetDirectories(char* log_filename, char* log_dir)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeDump(const Tree_t*         tree,
+TreeErr_t TreeDump(MathCtx_t* math_ctx,
                    const TreeDumpInfo_t* dump_info,
                    const char* fmt, ...)
 {
     va_list args = {};
     va_start(args, fmt);
 
-    TreeErr_t result = vTreeDump(tree, dump_info, fmt, args);
+    TreeErr_t result = vTreeDump(math_ctx, dump_info, fmt, args);
 
     va_end(args);
 
@@ -106,21 +106,21 @@ MathErr_t MathVarsTableDump(const MathCtx_t* math_ctx, const char* fmt, ...)
 
     for (size_t i = 0; i < math_ctx->capacity; i++)
     {
-        fprintf(fp, "%9zu |", i);
+        fprintf(fp, "%12zu |", i);
     }
 
     fprintf(fp, "\nnames: ");
 
     for (size_t i = 0; i < math_ctx->capacity; i++)
     {
-        fprintf(fp, "%9s |", math_ctx->vars_table[i].str);
+        fprintf(fp, "%12s |", math_ctx->vars_table[i].str);
     }
 
     fprintf(fp, "\nhash:  ");
 
     for (size_t i = 0; i < math_ctx->capacity; i++)
     {
-        fprintf(fp, "%9zu |", math_ctx->vars_table[i].hash);
+        fprintf(fp, "%12zu |", math_ctx->vars_table[i].hash);
     }
 
     fclose(fp);
@@ -177,12 +177,14 @@ TreeErr_t TreeReadBufferDump(const char* buffer, ssize_t pos, const char* fmt, .
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t vTreeDump(const Tree_t*         tree,
+TreeErr_t vTreeDump(MathCtx_t* math_ctx,
                     const TreeDumpInfo_t* dump_info,
                     const char* fmt, va_list args)
 {
-    assert(tree      != NULL);
+    assert(math_ctx != NULL);
     assert(dump_info != NULL);
+
+    Tree_t* tree = &math_ctx->tree;
 
     TreeErr_t error = TREE_SUCCESS;
 
@@ -221,7 +223,7 @@ TreeErr_t vTreeDump(const Tree_t*         tree,
                 tree, tree->size, tree->dummy);
 
     TreeErr_t graph_error = TREE_SUCCESS;
-    if ((graph_error = TreeGraphDump(tree, graph_name, log_dir)))
+    if ((graph_error = TreeGraphDump(math_ctx, graph_name, log_dir)))
     {
         fclose(fp);
         return graph_error;
@@ -275,10 +277,14 @@ TreeErr_t TreeOpenLogFile(FILE** fp_ptr, int* calls_count_ptr, char* dest_log_di
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeGraphDump(const Tree_t* tree,
+TreeErr_t TreeGraphDump(MathCtx_t* math_ctx,
                         const char* graph_name,
                         const char* log_dir)
 {
+    assert(math_ctx != NULL);
+
+    Tree_t* tree = &math_ctx->tree;
+
     if (tree == NULL)
     {
         PRINTERR("TREE_NULL");
@@ -312,7 +318,7 @@ TreeErr_t TreeGraphDump(const Tree_t* tree,
     {
         TreeErr_t error = TREE_SUCCESS;
 
-        if ((error = TreeNodeDump(tree->dummy->right, dot_file)))
+        if ((error = TreeNodeDump(tree->dummy->right, dot_file, math_ctx)))
         {
             return error;
         }
@@ -396,7 +402,7 @@ TreeErr_t TreeConvertGraphFile(const char* dot_file_path,
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeNodeDump(const TreeNode_t* node, FILE* fp)
+TreeErr_t TreeNodeDump(const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx)
 {
     assert(node != NULL);
     assert(fp   != NULL);
@@ -405,16 +411,16 @@ TreeErr_t TreeNodeDump(const TreeNode_t* node, FILE* fp)
 
     if (node->left != NULL)
     {
-        if ((error = TreeNodeDump(node->left, fp)))
+        if ((error = TreeNodeDump(node->left, fp, math_ctx)))
             return error;
     }
 
-    if ((error = DumpTreeNodeAndEdges(node, fp)))
+    if ((error = DumpTreeNodeAndEdges(node, fp, math_ctx)))
         return error;
 
     if (node->right != NULL)
     {
-        if ((error = TreeNodeDump(node->right, fp)))
+        if ((error = TreeNodeDump(node->right, fp, math_ctx)))
             return error;
     }
 
@@ -448,9 +454,9 @@ void TreeNodePrint(const TreeNode_t* node)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t DumpTreeNodeAndEdges(const TreeNode_t* node, FILE* fp)
+TreeErr_t DumpTreeNodeAndEdges(const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx)
 {
-    if (DumpTreeSingleNode(node, fp))
+    if (DumpTreeSingleNode(node, fp, math_ctx))
     {
         return TREE_DUMP_ERROR;
     }
@@ -496,7 +502,7 @@ int DumpTreeEdges(const TreeNode_t* node, FILE* fp)
 
 //------------------------------------------------------------------------------------------
 
-int DumpTreeSingleNode(const TreeNode_t* node, FILE* fp)
+int DumpTreeSingleNode(const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx)
 {
     assert(node != NULL);
     assert(fp   != NULL);
@@ -512,7 +518,7 @@ int DumpTreeSingleNode(const TreeNode_t* node, FILE* fp)
             break;
 
         case TYPE_VAR:
-            DumpTreeVarNode(node, fp);
+            DumpTreeVarNode(node, fp, math_ctx);
             break;
 
         default:
@@ -545,16 +551,17 @@ int DumpTreeOpNode(const TreeNode_t* node, FILE* fp)
 
 //------------------------------------------------------------------------------------------
 
-int DumpTreeVarNode(const TreeNode_t* node, FILE* fp)
+int DumpTreeVarNode(const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx)
 {
     assert(node != NULL);
     assert(fp   != NULL);
 
     char str_data[MAX_DATA_LEN] = {};
 
-    snprintf(str_data, sizeof(str_data), "type = %s | value = %zu",
+    snprintf(str_data, sizeof(str_data), "type = %s | value = %s (%zu)",
                                          TYPE_CASES_TABLE[node->data.type].name,
-                                         node->data.value.var); // TODO: %s in array of names
+                                         math_ctx->vars_table[node->data.value.var].str,
+                                         node->data.value.var);
 
     return DumpTreeDefaultNode(node, str_data,
                                TYPE_CASES_TABLE[node->data.type].color,

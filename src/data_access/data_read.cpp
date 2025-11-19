@@ -48,8 +48,8 @@ TreeErr_t TreeReadData(MathCtx_t* math_ctx, const char* data_file_path)
     if ((error = ReadNode(math_ctx, buffer, &i, &math_ctx->tree.dummy->right)))
         return error;
 
-    DEBUG_TREE_CHECK(&math_ctx->tree, "ERROR AFTER TREE READ DATA");
-    TREE_CALL_DUMP  (&math_ctx->tree, "DUMP AFTER TREE READ DATA %s", data_file_path);
+    // DEBUG_TREE_CHECK(&math_ctx->tree, "ERROR AFTER TREE READ DATA");
+    TREE_CALL_DUMP  (math_ctx, "DUMP AFTER TREE READ DATA %s", data_file_path);
 
     return TREE_SUCCESS;
 }
@@ -82,7 +82,7 @@ TreeErr_t ReadNode(MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t**
         if ((*pnode = TreeNodeCtor(&math_ctx->tree, data, NULL, NULL)) == NULL)
             return TREE_NULL;
 
-        TREE_CALL_DUMP(&math_ctx->tree, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
+        TREE_CALL_DUMP(math_ctx, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
 
         if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->left)))
             return error;
@@ -151,10 +151,10 @@ TreeErr_t GetMathData(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t
     if (ProcessMathDataOpCase(str, str_len, data) == 1)
         return TREE_SUCCESS;
 
-    if (ProcessMathDataVarCase(math_ctx, str, str_len, data) == 1)
+    if (ProcessMathDataNumCase(str, data) == 1)
         return TREE_SUCCESS;
 
-    if (ProcessMathDataNumCase(str, data) == 1)
+    if (ProcessMathDataVarCase(math_ctx, str, str_len, data) == 1)
         return TREE_SUCCESS;
 
     PRINTERR("Syntax error: input doesn't match format, input: %s, len = %d", str, str_len);
@@ -207,9 +207,8 @@ int ProcessMathDataVarCase(MathCtx_t* math_ctx, char* str, size_t str_len, MathD
     assert(data != NULL);
     assert(str  != NULL);
 
-    char var = *str;
-
-    if (str_len != 1 || !isalpha(var))
+// TODO: сделать список допустимых символов
+    if (!isalpha(*str))
         return 0;
 
     data->type = TYPE_VAR;
