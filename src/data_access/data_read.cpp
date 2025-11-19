@@ -38,11 +38,10 @@ TreeErr_t TreeReadData(Tree_t* tree, const char* data_file_path)
     tree->buffer = buffer;
 
     ssize_t i = 0;
+    TreeErr_t error = TREE_SUCCESS;
 
-    tree->dummy->right = ReadNode(tree, buffer, &i);
-
-    if (tree->dummy->right == NULL)
-        return TREE_NULL;
+    if ((error = ReadNode(tree, buffer, &i, &tree->dummy->right)))
+        return error;
 
     DEBUG_TREE_CHECK(tree, "ERROR AFTER TREE READ DATA");
     TREE_CALL_DUMP  (tree, "DUMP AFTER TREE READ DATA %s", data_file_path);
@@ -52,15 +51,15 @@ TreeErr_t TreeReadData(Tree_t* tree, const char* data_file_path)
 
 //------------------------------------------------------------------------------------------
 
-TreeNode_t* ReadNode(Tree_t* tree, char* buffer, ssize_t* pos)
+TreeErr_t ReadNode(Tree_t* tree, char* buffer, ssize_t* pos, TreeNode_t** pnode)
 {
     assert(buffer != NULL);
+    assert(pnode  != NULL);
     assert(tree   != NULL);
     assert(pos    != NULL);
 
-    TreeNode_t* node = NULL;
-
     char first_char = buffer[*pos];
+    TreeErr_t error = TREE_SUCCESS;
 
     if (first_char == '(')
     {
@@ -70,25 +69,26 @@ TreeNode_t* ReadNode(Tree_t* tree, char* buffer, ssize_t* pos)
 
         TreeElem_t data = TREE_POISON;
 
-        if (ReadNodeData(buffer, pos, &data))
-            return NULL;
+        if ((error = ReadNodeData(buffer, pos, &data)))
+            return error;
 
         BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((node = TreeNodeCtor(tree, data, NULL, NULL)) == NULL)
-            return NULL;
+        if ((*pnode = TreeNodeCtor(tree, data, NULL, NULL)) == NULL)
+            return TREE_NULL;
 
-        node->left  = ReadNode(tree, buffer, pos);
+        TREE_CALL_DUMP(tree, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
+
+        if ((error = ReadNode(tree, buffer, pos, &(*pnode)->left)))
+            return error;
         BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING NODE LEFT TO %s", TYPE_CASES_TABLE[data.type].name);
 
-        node->right = ReadNode(tree, buffer, pos);
+        if ((error = ReadNode(tree, buffer, pos, &(*pnode)->right)))
+            return error;
         BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING NODE RIGHT TO %s", TYPE_CASES_TABLE[data.type].name);
 
-        TreeDumpInfo_t dump_info = {TREE_SUCCESS, __PRETTY_FUNCTION__, __FILE__, __LINE__};
-        TreeDump(tree, &dump_info, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
-
         if (SkipLetter(buffer, pos, ')'))
-            return NULL;
+            return TREE_INVALID_INPUT;
 
         SkipSpaces(buffer, pos);
 
@@ -103,10 +103,10 @@ TreeNode_t* ReadNode(Tree_t* tree, char* buffer, ssize_t* pos)
     else
     {
         PRINTERR("Syntax error in tree data (unknown symbol = \"%c\" )\n", first_char);
-        return NULL;
+        return TREE_INVALID_INPUT;
     }
 
-    return node;
+    return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------

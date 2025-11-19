@@ -1,3 +1,9 @@
+run
+
+*.dot
+*.svg
+*.txt
+
 # Prerequisites
 *.d
 

@@ -9,7 +9,7 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-TreeNode_t* ReadNode    (Tree_t* tree, char* buffer, ssize_t* pos);
+TreeErr_t ReadNode      (Tree_t* tree, char* buffer, ssize_t* pos, TreeNode_t** pnode);
 TreeErr_t TreeReadData  (Tree_t* tree, const char* data_file_path);
 TreeErr_t ReadNodeData  (char* buffer, ssize_t* pos,   MathData_t* data);
 TreeErr_t GetMathData   (char* str,    size_t str_len, MathData_t* data);

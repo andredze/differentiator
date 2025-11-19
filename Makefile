@@ -47,4 +47,7 @@ obj/%.o: src/%.cpp
 clean:
 	rm -rf $(OBJS) $(TARGET)
 
+dlog:
+	rm -rf log/*
+
 .PHONY: all clean
