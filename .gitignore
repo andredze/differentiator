@@ -3,6 +3,7 @@ run
 *.dot
 *.svg
 *.txt
+*.html
 
 # Prerequisites
 *.d

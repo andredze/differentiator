@@ -3,19 +3,24 @@
 //------------------------------------------------------------------------------------------
 
 #ifdef TREE_DEBUG
-    #define BUFFER_DUMP(buffer, pos, fmt, ...)                      \
+    #define BUFFER_DUMP(buffer, pos, fmt, ...)                            \
+            BEGIN                                                         \
+            TreeReadBufferDump((buffer), (pos), (fmt), ##__VA_ARGS__);    \
+            END
+    #define VARS_DUMP(math_ctx, fmt, ...)                           \
             BEGIN                                                   \
-            TreeReadBufferDump(buffer, pos, fmt, ##__VA_ARGS__);    \
+            MathVarsTableDump((math_ctx), (fmt), ##__VA_ARGS__);    \
             END
 #else
     #define BUFFER_DUMP(buffer, pos, fmt, ...) ;
+    #define VARS_DUMP(math_ctx, fmt, ...)      ;
 #endif
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeReadData(Tree_t* tree, const char* data_file_path)
+TreeErr_t TreeReadData(MathCtx_t* math_ctx, const char* data_file_path)
 {
-    DEBUG_TREE_CHECK(tree, "ERROR BEFORE TREE READ DATA");
+    DEBUG_TREE_CHECK(&math_ctx->tree, "ERROR BEFORE TREE READ DATA");
 
     assert(data_file_path != NULL);
 
@@ -35,28 +40,28 @@ TreeErr_t TreeReadData(Tree_t* tree, const char* data_file_path)
     {
         return TREE_FILE_ERR;
     }
-    tree->buffer = buffer;
+    math_ctx->tree.buffer = buffer;
 
     ssize_t i = 0;
     TreeErr_t error = TREE_SUCCESS;
 
-    if ((error = ReadNode(tree, buffer, &i, &tree->dummy->right)))
+    if ((error = ReadNode(math_ctx, buffer, &i, &math_ctx->tree.dummy->right)))
         return error;
 
-    DEBUG_TREE_CHECK(tree, "ERROR AFTER TREE READ DATA");
-    TREE_CALL_DUMP  (tree, "DUMP AFTER TREE READ DATA %s", data_file_path);
+    DEBUG_TREE_CHECK(&math_ctx->tree, "ERROR AFTER TREE READ DATA");
+    TREE_CALL_DUMP  (&math_ctx->tree, "DUMP AFTER TREE READ DATA %s", data_file_path);
 
     return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t ReadNode(Tree_t* tree, char* buffer, ssize_t* pos, TreeNode_t** pnode)
+TreeErr_t ReadNode(MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode)
 {
-    assert(buffer != NULL);
-    assert(pnode  != NULL);
-    assert(tree   != NULL);
-    assert(pos    != NULL);
+    assert(math_ctx != NULL);
+    assert(buffer   != NULL);
+    assert(pnode    != NULL);
+    assert(pos      != NULL);
 
     char first_char = buffer[*pos];
     TreeErr_t error = TREE_SUCCESS;
@@ -69,21 +74,21 @@ TreeErr_t ReadNode(Tree_t* tree, char* buffer, ssize_t* pos, TreeNode_t** pnode)
 
         TreeElem_t data = TREE_POISON;
 
-        if ((error = ReadNodeData(buffer, pos, &data)))
+        if ((error = ReadNodeData(math_ctx, buffer, pos, &data)))
             return error;
 
         BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((*pnode = TreeNodeCtor(tree, data, NULL, NULL)) == NULL)
+        if ((*pnode = TreeNodeCtor(&math_ctx->tree, data, NULL, NULL)) == NULL)
             return TREE_NULL;
 
-        TREE_CALL_DUMP(tree, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
+        TREE_CALL_DUMP(&math_ctx->tree, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((error = ReadNode(tree, buffer, pos, &(*pnode)->left)))
+        if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->left)))
             return error;
         BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING NODE LEFT TO %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((error = ReadNode(tree, buffer, pos, &(*pnode)->right)))
+        if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->right)))
             return error;
         BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING NODE RIGHT TO %s", TYPE_CASES_TABLE[data.type].name);
 
@@ -111,7 +116,7 @@ TreeErr_t ReadNode(Tree_t* tree, char* buffer, ssize_t* pos, TreeNode_t** pnode)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t ReadNodeData(char* buffer, ssize_t* pos, MathData_t* data)
+TreeErr_t ReadNodeData(MathCtx_t* math_ctx, char* buffer, ssize_t* pos, MathData_t* data)
 {
     assert(buffer != NULL);
     assert(data   != NULL);
@@ -124,9 +129,9 @@ TreeErr_t ReadNodeData(char* buffer, ssize_t* pos, MathData_t* data)
         PRINTERR("Error with reading data");
         return TREE_FILE_ERR;
     }
-    DPRINTF("buffer + pos: %s, data_len = %zu\n", &buffer[*pos], data_len);
+    // DPRINTF("buffer + pos: %s, data_len = %zu\n", &buffer[*pos], data_len);
 
-    if (GetMathData(buffer + *pos + 1, (size_t) (data_len - 2), data))
+    if (GetMathData(math_ctx, buffer + *pos + 1, (size_t) (data_len - 2), data))
         return TREE_INVALID_INPUT;
 
     (*pos) += data_len; /* moving pos to the next data */
@@ -138,7 +143,7 @@ TreeErr_t ReadNodeData(char* buffer, ssize_t* pos, MathData_t* data)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t GetMathData(char* str, size_t str_len, MathData_t* data)
+TreeErr_t GetMathData(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data)
 {
     assert(data != NULL);
     assert(str  != NULL);
@@ -146,7 +151,7 @@ TreeErr_t GetMathData(char* str, size_t str_len, MathData_t* data)
     if (ProcessMathDataOpCase(str, str_len, data) == 1)
         return TREE_SUCCESS;
 
-    if (ProcessMathDataVarCase(str, str_len, data) == 1)
+    if (ProcessMathDataVarCase(math_ctx, str, str_len, data) == 1)
         return TREE_SUCCESS;
 
     if (ProcessMathDataNumCase(str, data) == 1)
@@ -197,7 +202,7 @@ int ProcessMathDataNumCase(char* str, MathData_t* data)
 
 //------------------------------------------------------------------------------------------
 
-int ProcessMathDataVarCase(char* str, size_t str_len, MathData_t* data)
+int ProcessMathDataVarCase(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data)
 {
     assert(data != NULL);
     assert(str  != NULL);
@@ -207,10 +212,51 @@ int ProcessMathDataVarCase(char* str, size_t str_len, MathData_t* data)
     if (str_len != 1 || !isalpha(var))
         return 0;
 
-    data->type      = TYPE_VAR;
-    data->value.var = var;
+    data->type = TYPE_VAR;
+
+    if (PutVarInTable(math_ctx, str, str_len, data))
+        return -1;
 
     return 1;
+}
+
+//------------------------------------------------------------------------------------------
+
+MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data)
+{
+    assert(math_ctx != NULL);
+    assert(data     != NULL);
+    assert(str      != NULL);
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if (math_ctx->size >= math_ctx->capacity)
+    {
+        if ((error = MathVarsTableRealloc(math_ctx)))
+            return error;
+    }
+
+    char* var_str = strndup(str, str_len);
+
+    if (var_str == NULL)
+    {
+        PRINTERR("Memory allocation failed");
+        return MATH_ALLOC_ERROR;
+    }
+
+    math_ctx->vars_table[math_ctx->size].str  = var_str;
+    math_ctx->vars_table[math_ctx->size].hash = GetHash(var_str);
+
+    data->value.var = math_ctx->size;
+
+    math_ctx->size++;
+
+    VARS_DUMP(math_ctx, "DUMP AFTER PUTTING VARIABLE %s (hash = %zu, index = %zu)",
+                        var_str,
+                        math_ctx->vars_table[math_ctx->size].hash,
+                        math_ctx->size - 1);
+
+    return MATH_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------

@@ -67,7 +67,7 @@ typedef union MathValue
 {
     MathOp_t op;
     double   num;
-    int      var;
+    size_t   var;
 } MathValue_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -166,7 +166,7 @@ const TypeCase_t TYPE_CASES_TABLE[] =
 {
     [TYPE_VAR] = {TYPE_VAR, "VAR",  "Mrecord", "#006400", "#C0FFC0", "#006400"},
     [TYPE_NUM] = {TYPE_NUM, "NUM",  "Mrecord", "#990000", "#FFC0C0", "#990000"},
-    [TYPE_OP] =  {TYPE_OP,  "OPER", "record", "#000064", "#C0C0FF", "#000064"}
+    [TYPE_OP] =  {TYPE_OP,  "OPER", "record",  "#000064", "#C0C0FF", "#000064"}
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————

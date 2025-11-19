@@ -4,6 +4,7 @@
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "tree_types.h"
+#include "math_types.h"
 #include <time.h>
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -15,6 +16,8 @@ int TreePrintElement(const TreeElem_t* data);
 TreeErr_t TreeReadBufferDump(const char* buffer,
                              ssize_t pos,
                              const char* fmt, ...);
+
+MathErr_t MathVarsTableDump(const MathCtx_t* math_ctx, const char* fmt, ...);
 
 TreeErr_t TreeDump(const Tree_t*         tree,
                    const TreeDumpInfo_t* dump_info,

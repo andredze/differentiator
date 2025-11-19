@@ -4,21 +4,25 @@
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "tree_commands.h"
+#include "tree_debug.h"
 #include <ctype.h>
 #include <sys/stat.h>
+#include "math_funcs.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-TreeErr_t ReadNode      (Tree_t* tree, char* buffer, ssize_t* pos, TreeNode_t** pnode);
-TreeErr_t TreeReadData  (Tree_t* tree, const char* data_file_path);
-TreeErr_t ReadNodeData  (char* buffer, ssize_t* pos,   MathData_t* data);
-TreeErr_t GetMathData   (char* str,    size_t str_len, MathData_t* data);
+TreeErr_t TreeReadData  (MathCtx_t* math_ctx, const char* data_file_path);
+TreeErr_t ReadNode      (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode);
+TreeErr_t ReadNodeData  (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, MathData_t* data);
+TreeErr_t GetMathData   (MathCtx_t* math_ctx, char* str,  size_t str_len, MathData_t* data);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-int ProcessMathDataOpCase (char* str, size_t str_len, MathData_t* data);
-int ProcessMathDataNumCase(char* str,                 MathData_t* data);
-int ProcessMathDataVarCase(char* str, size_t str_len, MathData_t* data);
+int ProcessMathDataOpCase (                     char* str, size_t str_len, MathData_t* data);
+int ProcessMathDataNumCase(                     char* str,                 MathData_t* data);
+int ProcessMathDataVarCase(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data);
+
+MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

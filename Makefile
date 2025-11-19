@@ -17,14 +17,15 @@ CXXFLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wsign-convers
 
 CXXFLAGS += -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-CXXFLAGS += -I include -I include/tree -I include/data_access
+CXXFLAGS += -I include -I include/tree -I include/data_access -I include/math
 
 SOURCES = src/main.cpp 						\
           src/data_access/data_read.cpp 	\
           src/data_access/data_write.cpp 	\
           src/tree/tree_commands.cpp 		\
           src/tree/tree_debug.cpp 			\
-          src/colors.cpp
+          src/colors.cpp					\
+		  src/math/math_funcs.cpp
 
 ifdef DEBUG
 CXXFLAGS += -D TREE_DEBUG
@@ -34,7 +35,7 @@ OBJS = $(SOURCES:src/%.cpp=obj/%.o)
 
 TARGET = run
 
-$(shell mkdir -p obj obj/data_access obj/tree)
+$(shell mkdir -p obj obj/data_access obj/tree obj/math)
 
 all: $(TARGET)
 

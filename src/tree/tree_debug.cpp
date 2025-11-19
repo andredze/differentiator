@@ -13,7 +13,7 @@ int TreePrintElement(const TreeElem_t* data)
             printf("{NUM, {%lg}}", data->value.num);
             break;
         case TYPE_VAR:
-            printf("{VAR, {%d}}", data->value.var);
+            printf("{VAR, {%zu}}", data->value.var);
             // printf("{VAR, {%c [%d]}}", vars[data->value.var], data->value.var);
             break;
         default:
@@ -73,6 +73,61 @@ TreeErr_t TreeDump(const Tree_t*         tree,
     va_end(args);
 
     return result;
+}
+
+//------------------------------------------------------------------------------------------
+
+MathErr_t MathVarsTableDump(const MathCtx_t* math_ctx, const char* fmt, ...)
+{
+    assert(fmt != NULL);
+
+    va_list args = {};
+    va_start(args, fmt);
+
+    FILE* fp = NULL;
+
+    if (TreeOpenLogFile(&fp, NULL, NULL))
+        return MATH_TREE_ERROR;
+
+    fprintf(fp, "<pre><h4><font color=blue>");
+
+    vfprintf(fp, fmt, args);
+
+    fprintf(fp, "</h4></font>");
+
+    fprintf(fp, "vars_table [%p]:\n\n"
+                "size     = %zu\n"
+                "capacity = %zu\n\n",
+                math_ctx->vars_table,
+                math_ctx->size,
+                math_ctx->capacity);
+
+    fprintf(fp, "index: ");
+
+    for (size_t i = 0; i < math_ctx->capacity; i++)
+    {
+        fprintf(fp, "%9zu |", i);
+    }
+
+    fprintf(fp, "\nnames: ");
+
+    for (size_t i = 0; i < math_ctx->capacity; i++)
+    {
+        fprintf(fp, "%9s |", math_ctx->vars_table[i].str);
+    }
+
+    fprintf(fp, "\nhash:  ");
+
+    for (size_t i = 0; i < math_ctx->capacity; i++)
+    {
+        fprintf(fp, "%9zu |", math_ctx->vars_table[i].hash);
+    }
+
+    fclose(fp);
+
+    va_end(args);
+
+    return MATH_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
@@ -497,7 +552,7 @@ int DumpTreeVarNode(const TreeNode_t* node, FILE* fp)
 
     char str_data[MAX_DATA_LEN] = {};
 
-    snprintf(str_data, sizeof(str_data), "type = %s | value = %d",
+    snprintf(str_data, sizeof(str_data), "type = %s | value = %zu",
                                          TYPE_CASES_TABLE[node->data.type].name,
                                          node->data.value.var); // TODO: %s in array of names
 
