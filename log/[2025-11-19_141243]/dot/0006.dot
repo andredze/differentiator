@@ -1,0 +1,14 @@
+digraph Tree
+{
+	ranksep=0.75;
+    nodesep=0.5;
+    node [
+        fontname  = "Arial",
+        shape     = "Mrecord",
+        style     = "filled",
+        color     = "#3E3A22",
+        fillcolor = "#E3DFC9",
+        fontcolor = "#3E3A22"
+    ];
+	node0x503000000040 [label = "{ 0x503000000040 | type = PZN | value = PZN | { left = (nil) | right = (nil) }}", color = "#3E3A22", fillcolor = "#ecede8", fontcolor = "#3E3A22", shape = "record"];
+}
