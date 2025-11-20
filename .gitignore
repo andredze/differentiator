@@ -1,5 +1,7 @@
 run
 
+*.log
+*.aux
 *.dot
 *.svg
 *.txt

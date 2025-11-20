@@ -2,6 +2,8 @@
 
 /* ==================== Domain Specific Language for differentiation ==================== */
 
+// sudo apt-get install texlive-latex-extra
+
 // lnode means left_node
 // rnode means right_node
 
@@ -32,10 +34,10 @@ static TreeNode_t* MathDiffMul      (MathCtx_t* math_ctx, TreeNode_t* node,    s
 static TreeNode_t* MathDiffDiv      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
 static TreeNode_t* MathDiffSin      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
 static TreeNode_t* MathDiffCos      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
-// static TreeNode_t* MathDiffTg       (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
-// static TreeNode_t* MathDiffCtg      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
-// static TreeNode_t* MathDiffLn       (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
-// static TreeNode_t* MathDiffDeg      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
+static TreeNode_t* MathDiffTg       (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
+static TreeNode_t* MathDiffCtg      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
+static TreeNode_t* MathDiffLn       (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
+static TreeNode_t* MathDiffDeg      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -47,10 +49,10 @@ TreeNode_t* (* const MATH_DIFF_OPER_TABLE[]) (MathCtx_t*, TreeNode_t*, size_t) =
     [OP_DIV] = MathDiffDiv,
     [OP_SIN] = MathDiffSin,
     [OP_COS] = MathDiffCos,
-    // [OP_TG]  = MathDiffTg,
-    // [OP_CTG] = MathDiffCtg,
-    // [OP_LN]  = MathDiffLn,
-    // [OP_DEG] = MathDiffDeg
+    [OP_TG]  = MathDiffTg,
+    [OP_CTG] = MathDiffCtg,
+    [OP_LN]  = MathDiffLn,
+    [OP_DEG] = MathDiffDeg
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -226,6 +228,46 @@ static TreeNode_t* MathDiffCos(MathCtx_t* math_ctx, TreeNode_t* node, size_t dif
     assert(node     != NULL);
 
     return MUL_(MUL_(SIN_(cR), NUM_(-1)), dR);
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* MathDiffTg(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+{
+    assert(math_ctx != NULL);
+    assert(node     != NULL);
+
+    return MUL_(DIV_(NUM_(1), SQR_(COS_(cR))), dR);
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* MathDiffCtg(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+{
+    assert(math_ctx != NULL);
+    assert(node     != NULL);
+
+    return MUL_(DIV_(NUM_(-1), SQR_(SIN_(cR))), dR);
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* MathDiffLn(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+{
+    assert(math_ctx != NULL);
+    assert(node     != NULL);
+
+    return MUL_(DIV_(NUM_(1), cR), dR);
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* MathDiffDeg(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+{
+    assert(math_ctx != NULL);
+    assert(node     != NULL);
+
+    return MUL_(DIV_(NUM_(1), cR), dR);
 }
 
 //==========================================================================================

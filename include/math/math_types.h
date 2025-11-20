@@ -24,11 +24,6 @@ typedef struct MathContext
     size_t     size;
     size_t     capacity;
 
-    struct {
-        FILE* tex_fp;
-        char tex_file_name[MAX_FILENAME_LEN];
-    } debug;
-
 } MathCtx_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————

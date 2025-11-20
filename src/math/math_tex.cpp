@@ -2,11 +2,16 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-static void TexDumpTitle (FILE* fp);
-static void TexDumpEnding(FILE* fp);
+static void TexDumpTitle    ();
+static void TexDumpEnding   ();
+static void TexConvertToPdf ();
 
 static void TexWriteNode(TreeNode_t* node, MathCtx_t* math_ctx);
 static void TexWriteData(MathData_t  data, MathCtx_t* math_ctx);
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+static FILE* fp = NULL;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -40,8 +45,6 @@ MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
         return MATH_SUCCESS;
     }
 
-    FILE* fp = math_ctx->debug.tex_fp;
-
     vfprintf(fp, fmt, args);
 
     fprintf(fp, "\n\\[");
@@ -57,37 +60,37 @@ MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathOpenTexFile(MathCtx_t* math_ctx)
+MathErr_t MathOpenTexFile()
 {
-    snprintf(math_ctx->debug.tex_file_name, MAX_FILENAME_LEN, "tex_log_%4zu.tex", (size_t) math_ctx % 100000);
+    fp = fopen(TEX_FILE_NAME, "w");
 
-    math_ctx->debug.tex_fp = fopen(math_ctx->debug.tex_file_name, "w");
-
-    if (math_ctx->debug.tex_fp == NULL)
+    if (fp == NULL)
     {
-        PRINTERR("Opening file %s failed", math_ctx->debug.tex_file_name);
+        PRINTERR("Opening file %s failed", TEX_FILE_NAME);
         return MATH_FILE_ERROR;
     }
 
-    TexDumpTitle(math_ctx->debug.tex_fp);
+    TexDumpTitle();
 
     return MATH_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathCloseTexFile(MathCtx_t* math_ctx)
+MathErr_t MathCloseTexFile()
 {
-    TexDumpEnding(math_ctx->debug.tex_fp);
+    TexDumpEnding();
 
-    fclose(math_ctx->debug.tex_fp);
+    fclose(fp);
+
+    TexConvertToPdf();
 
     return MATH_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-static void TexDumpTitle(FILE* fp)
+static void TexDumpTitle()
 {
     fprintf(fp,
 R"(\documentclass[12pt, a4paper]{article}
@@ -109,9 +112,25 @@ R"(\documentclass[12pt, a4paper]{article}
 
 //------------------------------------------------------------------------------------------
 
-static void TexDumpEnding(FILE* fp)
+static void TexDumpEnding()
 {
     fprintf(fp, "\\end{document}");
+}
+
+//------------------------------------------------------------------------------------------
+
+static void TexConvertToPdf()
+{
+    char command[MAX_COMMAND_LEN] = {};
+
+    snprintf(command, sizeof(command),
+            "pdflatex -interaction=nonstopmode \"$1\" | "
+            "grep -E \"(Error|Warning|Overfull|Underfull)\" %s",
+            TEX_FILE_NAME);
+
+    system(command);
+
+    DPRINTF("Converted %s to pdf\n", TEX_FILE_NAME);
 }
 
 //------------------------------------------------------------------------------------------
@@ -137,8 +156,6 @@ static void TexWriteNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
 static void TexWriteData(MathData_t data, MathCtx_t* math_ctx)
 {
-    FILE* fp = math_ctx->debug.tex_fp;
-
     switch (data.type)
     {
         case TYPE_NUM:

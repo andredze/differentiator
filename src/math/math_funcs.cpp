@@ -18,11 +18,6 @@ MathErr_t MathCtxCtor(MathCtx_t* math_ctx, size_t vars_capacity)
     math_ctx->size = 0;
     math_ctx->capacity = vars_capacity;
 
-    MathErr_t error = MATH_SUCCESS;
-
-    if ((error = MathOpenTexFile(math_ctx)))
-        return error;
-
     return MATH_SUCCESS;
 }
 
@@ -91,11 +86,6 @@ MathErr_t MathCtxDtor(MathCtx_t* math_ctx)
     TreeDtor(&math_ctx->tree);
 
     math_ctx->tree = {};
-
-    MathErr_t error = MATH_SUCCESS;
-
-    if ((error = MathCloseTexFile(math_ctx)))
-        return error;
 
     return MATH_SUCCESS;
 }

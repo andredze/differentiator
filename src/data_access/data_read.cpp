@@ -50,6 +50,7 @@ TreeErr_t TreeReadData(MathCtx_t* math_ctx, const char* data_file_path)
 
     // DEBUG_TREE_CHECK(&math_ctx->tree, "ERROR AFTER TREE READ DATA");
     TREE_CALL_DUMP  (math_ctx, "DUMP AFTER TREE READ DATA %s", data_file_path);
+    MathCtxTexDump  (math_ctx, "Вот такое выражение прочел я");
 
     return TREE_SUCCESS;
 }

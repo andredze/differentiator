@@ -12,6 +12,9 @@ int main()
     MathCtx_t diff_math_ctx = {};
 
     do {
+        if (MathOpenTexFile())
+            break;
+
         if (MathCtxCtor(&math_ctx, 0))
             break;
 
@@ -27,15 +30,16 @@ int main()
         if (MathDifferentiate(&math_ctx, &diff_math_ctx, "+"))
             break;
 
-//         double result = 0.0;
-//
-//         if (MathEvaluate(&math_ctx, &result))
-//             break;
-//
-//         printf("result = %lg\n", result);
+        double result = 0.0;
+
+        if (MathEvaluate(&math_ctx, &result))
+            break;
+
+        printf("result = %lg\n", result);
 
     } while (0);
 
+    MathCloseTexFile();
     MathCtxDtor(&diff_math_ctx);
     MathCtxDtor(&math_ctx);
 
