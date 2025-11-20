@@ -114,23 +114,30 @@ static TreeNode_t* MathDiffNode(MathCtx_t* math_ctx, TreeNode_t* node, size_t di
     assert(math_ctx != NULL);
     assert(node     != NULL);
 
+    TreeNode_t* new_node = NULL;
+
     switch (node->data.type)
     {
         case TYPE_NUM:
-            return MathDiffNumber(math_ctx);
+            new_node = MathDiffNumber(math_ctx);
+            break;
 
         case TYPE_VAR:
-            return MathDiffVariable(math_ctx, node->data.value.var, diff_var_ind);
+            new_node = MathDiffVariable(math_ctx, node->data.value.var, diff_var_ind);
+            break;
 
         case TYPE_OP:
-            return MathDiffOperation(math_ctx, node, diff_var_ind);
+            new_node = MathDiffOperation(math_ctx, node, diff_var_ind);
+            break;
 
         default:
             PRINTERR("Unknown math value type");
             return NULL;
     }
 
-    return NULL;
+    MathTexDumpDiffSubtree(node, new_node, math_ctx);
+
+    return new_node;
 }
 
 //------------------------------------------------------------------------------------------
@@ -173,11 +180,7 @@ static TreeNode_t* MathDiffAdd(MathCtx_t* math_ctx, TreeNode_t* node, size_t dif
     assert(math_ctx != NULL);
     assert(node     != NULL);
 
-    TreeNode_t* new_node = ADD_(dL, dR);
-
-    MathCtxTexDump(math_ctx, "Dump after MathDiffAdd() at %p", new_node);
-
-    return new_node;
+    return ADD_(dL, dR);
 }
 
 //------------------------------------------------------------------------------------------

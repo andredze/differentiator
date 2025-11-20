@@ -27,15 +27,18 @@ int main()
         if (MathCtxTexDump(&math_ctx, "Main dump"))
             break;
 
-        if (MathDifferentiate(&math_ctx, &diff_math_ctx, "+"))
+        if (MathDifferentiate(&math_ctx, &diff_math_ctx, "x"))
             break;
 
-        double result = 0.0;
-
-        if (MathEvaluate(&math_ctx, &result))
+        if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))
             break;
 
-        printf("result = %lg\n", result);
+//         double result = 0.0;
+//
+//         if (MathEvaluate(&math_ctx, &result))
+//             break;
+//
+//         printf("result = %lg\n", result);
 
     } while (0);
 

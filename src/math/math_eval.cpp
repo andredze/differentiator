@@ -1,6 +1,19 @@
 #include "math_eval.h"
 
-//------------------------------------------------------------------------------------------
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+static MathErr_t MathGetVarValues          (MathCtx_t* math_ctx);
+static MathErr_t MathEvalNode              (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
+static MathErr_t MathEvalNodeOpCase        (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
+static MathErr_t MathEvalNodeUnaryOpCase   (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
+static MathErr_t MathEvalNodeBinaryOpCase  (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
+
+static MathErr_t MathExecuteBinaryOperation(MathOp_t operation, double left_result,
+                                            double right_result, double* result);
+
+static MathErr_t MathExecuteUnaryOperation(MathOp_t operation, double argument, double* result);
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
 {
@@ -11,7 +24,7 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
 
     MathErr_t error = MATH_SUCCESS;
 
-    if ((error = MathGetVariables(math_ctx)))
+    if ((error = MathGetVarValues(math_ctx)))
         return error;
 
     if ((error = MathEvalNode(math_ctx, math_ctx->tree.dummy->right, &result)))
@@ -24,7 +37,7 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathGetVariables(MathCtx_t* math_ctx)
+static MathErr_t MathGetVarValues(MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);
 
@@ -50,7 +63,7 @@ MathErr_t MathGetVariables(MathCtx_t* math_ctx)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathEvalNode(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
+static MathErr_t MathEvalNode(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
 {
     assert(math_ctx != NULL);
     assert(result   != NULL);
@@ -78,7 +91,7 @@ MathErr_t MathEvalNode(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathEvalNodeOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
+static MathErr_t MathEvalNodeOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
 {
     assert(math_ctx != NULL);
     assert(result   != NULL);
@@ -104,7 +117,7 @@ MathErr_t MathEvalNodeOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* resu
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathEvalNodeUnaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
+static MathErr_t MathEvalNodeUnaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
 {
     assert(math_ctx != NULL);
     assert(result   != NULL);
@@ -125,7 +138,7 @@ MathErr_t MathEvalNodeUnaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double*
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
+static MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double* result)
 {
     assert(math_ctx != NULL);
     assert(result   != NULL);
@@ -154,10 +167,10 @@ MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
-                                     double  left_result,
-                                     double  right_result,
-                                     double* result)
+static MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
+                                            double  left_result,
+                                            double  right_result,
+                                            double* result)
 {
     assert(result != NULL);
 
@@ -193,9 +206,9 @@ MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathExecuteUnaryOperation(MathOp_t operation,
-                                     double  argument,
-                                     double* result)
+static MathErr_t MathExecuteUnaryOperation(MathOp_t operation,
+                                           double  argument,
+                                           double* result)
 {
     assert(result != NULL);
 

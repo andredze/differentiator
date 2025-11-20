@@ -6,8 +6,9 @@ static void TexDumpTitle    ();
 static void TexDumpEnding   ();
 static void TexConvertToPdf ();
 
-static void TexWriteNode(TreeNode_t* node, MathCtx_t* math_ctx);
-static void TexWriteData(MathData_t  data, MathCtx_t* math_ctx);
+static void MathTexDumpNode     (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpUnaryOp  (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpData     (MathData_t  data, MathCtx_t* math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -47,15 +48,40 @@ MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
 
     vfprintf(fp, fmt, args);
 
-    fprintf(fp, "\n\\[");
-
-    TexWriteNode(math_ctx->tree.dummy->right, math_ctx);
-
-    fprintf(fp, "\\]\n");
+    MathTexDumpSubtree(math_ctx->tree.dummy->right, math_ctx);
 
     fflush(fp);
 
     return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    fprintf(fp, "\n\\[");
+
+    MathTexDumpNode(node, math_ctx);
+
+    fprintf(fp, "\\]\n");
+}
+
+//------------------------------------------------------------------------------------------
+
+void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx)
+{
+    fprintf(fp, "\n\\[");
+    fprintf(fp, R"(\frac{d}{dx})""(");
+
+    // TODO: как не терять переменные??? нужно хранить еще и src_mathctx????
+
+    MathTexDumpNode(node, math_ctx);
+
+    fprintf(fp, ") = ");
+
+    MathTexDumpNode(diff_node, math_ctx);
+
+    fprintf(fp, "\\]\n");
 }
 
 //------------------------------------------------------------------------------------------
@@ -124,8 +150,7 @@ static void TexConvertToPdf()
     char command[MAX_COMMAND_LEN] = {};
 
     snprintf(command, sizeof(command),
-            "pdflatex -interaction=nonstopmode \"$1\" | "
-            "grep -E \"(Error|Warning|Overfull|Underfull)\" %s",
+            "pdflatex -interaction=batchmode math_log.tex %s",
             TEX_FILE_NAME);
 
     system(command);
@@ -135,7 +160,7 @@ static void TexConvertToPdf()
 
 //------------------------------------------------------------------------------------------
 
-static void TexWriteNode(TreeNode_t* node, MathCtx_t* math_ctx)
+static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
 {
     if (node == NULL)
     {
@@ -143,19 +168,27 @@ static void TexWriteNode(TreeNode_t* node, MathCtx_t* math_ctx)
         return;
     }
 
-    if (node->left != NULL)
-        TexWriteNode(node->left, math_ctx);
+    if (node->data.type == TYPE_OP && OP_CASES_TABLE[node->data.value.op].args_count == 1)
+    {
+        MathTexDumpUnaryOp(node, math_ctx);
+        return;
+    }
 
-    TexWriteData(node->data, math_ctx);
+    if (node->left != NULL)
+        MathTexDumpNode(node->left, math_ctx);
+
+    MathTexDumpData(node->data, math_ctx);
 
     if (node->right != NULL)
-        TexWriteNode(node->right, math_ctx);
+        MathTexDumpNode(node->right, math_ctx);
 }
 
 //------------------------------------------------------------------------------------------
 
-static void TexWriteData(MathData_t data, MathCtx_t* math_ctx)
+static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
 {
+    assert(math_ctx != NULL);
+
     switch (data.type)
     {
         case TYPE_NUM:
@@ -174,6 +207,20 @@ static void TexWriteData(MathData_t data, MathCtx_t* math_ctx)
             PRINTERR("Unknown math data type");
             return;
     }
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexDumpUnaryOp(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    assert(math_ctx != NULL);
+    assert(node     != NULL);
+
+    fprintf(fp, "%s(", OP_CASES_TABLE[node->data.value.op].str);
+
+    MathTexDumpNode(node->right, math_ctx);
+
+    fprintf(fp, ")");
 }
 
 //------------------------------------------------------------------------------------------
