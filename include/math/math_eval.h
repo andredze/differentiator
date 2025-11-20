@@ -5,6 +5,7 @@
 
 #include "math_types.h"
 #include "math_funcs.h"
+#include "math_tex.h"
 #include <math.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————

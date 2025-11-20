@@ -1,26 +1,20 @@
-#ifndef MATH_EXPR_H
-#define MATH_EXPR_H
+#ifndef MATH_TEX_H
+#define MATH_TEX_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#include "tree_commands.h"
 #include "math_types.h"
-#include "math_tex.h"
+#include "tree_types.h"
+#include "math_funcs.h"
+#include <stdarg.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathCtxCtor           (MathCtx_t* math_ctx, size_t vars_capacity);
-MathErr_t MathVarsTableRealloc  (MathCtx_t* math_ctx);
-MathErr_t MathCtxDtor           (MathCtx_t* math_ctx);
-
-size_t GetHash(const char* str);
-
-int VarCaseCompare(const void* par1, const void* par2);
+MathErr_t MathOpenTexFile   (MathCtx_t* math_ctx);
+MathErr_t MathCloseTexFile  (MathCtx_t* math_ctx);
+MathErr_t MathCtxTexDump    (MathCtx_t* math_ctx, const char* fmt, ...);
+MathErr_t vMathCtxTexDump   (MathCtx_t* math_ctx, const char* fmt, va_list args);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-const int VARS_MIN_COUNT = 64;
-
-//——————————————————————————————————————————————————————————————————————————————————————————
-
-#endif /* MATH_EXPR_H */
+#endif /* MATH_TEX_H */

@@ -553,8 +553,11 @@ int DumpTreeOpNode(const TreeNode_t* node, FILE* fp)
 
 int DumpTreeVarNode(const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx)
 {
-    assert(node != NULL);
-    assert(fp   != NULL);
+    assert(math_ctx != NULL);
+    assert(node     != NULL);
+    assert(fp       != NULL);
+
+
 
     char str_data[MAX_DATA_LEN] = {};
 

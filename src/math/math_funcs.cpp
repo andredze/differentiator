@@ -5,24 +5,23 @@
 MathErr_t MathCtxCtor(MathCtx_t* math_ctx, size_t vars_capacity)
 {
     if (TreeCtor(&math_ctx->tree))
-    {
         return MATH_TREE_ERROR;
-    }
 
     if (vars_capacity < VARS_MIN_COUNT)
-    {
         vars_capacity = VARS_MIN_COUNT;
-    }
 
     math_ctx->vars_table = (VarCase_t*) calloc(VARS_MIN_COUNT, sizeof(VarCase_t));
 
     if (math_ctx->vars_table == NULL)
-    {
         return MATH_ALLOC_ERROR;
-    }
 
     math_ctx->size = 0;
     math_ctx->capacity = vars_capacity;
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if ((error = MathOpenTexFile(math_ctx)))
+        return error;
 
     return MATH_SUCCESS;
 }
@@ -93,7 +92,31 @@ MathErr_t MathCtxDtor(MathCtx_t* math_ctx)
 
     math_ctx->tree = {};
 
+    MathErr_t error = MATH_SUCCESS;
+
+    if ((error = MathCloseTexFile(math_ctx)))
+        return error;
+
     return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+int VarCaseCompare(const void* par1, const void* par2)
+{
+    assert(par1 != NULL);
+    assert(par2 != NULL);
+
+    size_t hash1 = ((const VarCase_t*) par1)->hash;
+    size_t hash2 = ((const VarCase_t*) par2)->hash;
+
+    if (hash1 < hash2)
+        return -1;
+
+    if (hash1 > hash2)
+        return 1;
+
+    return 0;
 }
 
 //------------------------------------------------------------------------------------------

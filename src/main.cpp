@@ -2,31 +2,42 @@
 #include "data_read.h"
 #include "math_funcs.h"
 #include "math_eval.h"
+#include "math_diff.h"
 
 //------------------------------------------------------------------------------------------
 
 int main()
 {
     MathCtx_t math_ctx = {};
-
-    if (MathCtxCtor(&math_ctx, 0))
-        return EXIT_FAILURE;
+    MathCtx_t diff_math_ctx = {};
 
     do {
-        if (TreeReadData(&math_ctx, "data/data.txt"))
+        if (MathCtxCtor(&math_ctx, 0))
             break;
 
-        double result = 0.0;
-
-        if (MathEvaluate(&math_ctx, &result))
+        if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
-        printf("result = %lg\n", result);
+        if (TreeReadData(&math_ctx, "data/sin.txt"))
+            break;
+
+        if (MathCtxTexDump(&math_ctx, "Main dump"))
+            break;
+
+        if (MathDifferentiate(&math_ctx, &diff_math_ctx, "+"))
+            break;
+
+//         double result = 0.0;
+//
+//         if (MathEvaluate(&math_ctx, &result))
+//             break;
+//
+//         printf("result = %lg\n", result);
 
     } while (0);
 
-    if (MathCtxDtor(&math_ctx))
-        return EXIT_FAILURE;
+    MathCtxDtor(&diff_math_ctx);
+    MathCtxDtor(&math_ctx);
 
     return EXIT_SUCCESS;
 }

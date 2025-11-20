@@ -5,6 +5,9 @@ run
 *.txt
 *.html
 
+*.tex
+*.pdf
+
 # Prerequisites
 *.d
 

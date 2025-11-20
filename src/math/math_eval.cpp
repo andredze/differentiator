@@ -147,6 +147,8 @@ MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node, double
             return error;
     }
 
+    MathCtxTexDump(math_ctx, "evaluated binary op at %p", node);
+
     return MathExecuteBinaryOperation(node->data.value.op, left_result, right_result, result);
 }
 
@@ -175,6 +177,10 @@ MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
 
         case OP_DIV:
             *result = left_result / right_result;
+            break;
+
+        case OP_DEG:
+            *result = pow(left_result, right_result);
             break;
 
         default:

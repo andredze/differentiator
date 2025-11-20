@@ -97,6 +97,24 @@ TreeNode_t* TreeNodeCtor(Tree_t*        tree,
 
 //------------------------------------------------------------------------------------------
 
+TreeNode_t* TreeCopySubtree(Tree_t* dest_tree, TreeNode_t* node)
+{
+    DPRINTF("node = %p\n", node);
+
+    assert(dest_tree != NULL);
+
+    if (node == NULL)
+    {
+        return NULL;
+    }
+
+    return TreeNodeCtor(dest_tree, node->data,
+                        TreeCopySubtree(dest_tree, node->left),
+                        TreeCopySubtree(dest_tree, node->right));
+}
+
+//------------------------------------------------------------------------------------------
+
 TreeErr_t TreeDtor(Tree_t* tree)
 {
     assert(tree != NULL);

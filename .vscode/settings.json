@@ -3,5 +3,9 @@
         "fcprintf",
         "vfcprintf"
     ],
-    "C_Cpp.dimInactiveRegions": false
+    "C_Cpp.dimInactiveRegions": false,
+    "files.associations": {
+        "*.txt": "plaintext",
+        "type_traits": "cpp"
+    }
 }

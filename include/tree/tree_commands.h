@@ -47,6 +47,7 @@ TreeErr_t TreeCtor             (Tree_t*     tree);
 
 TreeNode_t* TreeNodeCtor       (Tree_t* tree, MathData_t data, TreeNode_t* left, TreeNode_t* right);
 TreeErr_t   TreeGetData        (TreeNode_t* node, MathDataType_t type, MathData_t data);
+TreeNode_t* TreeCopySubtree    (Tree_t* dest_tree, TreeNode_t* node);
 TreeErr_t   TreeDtor           (Tree_t*     tree);
 
 TreeErr_t TreeNodeVerify       (const Tree_t* tree, TreeNode_t* node, size_t* calls_count);

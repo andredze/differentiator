@@ -9,7 +9,7 @@
 
 typedef struct VarCase
 {
-    char*  str;
+    char* str;
     size_t hash;
     double value;
 } VarCase_t;
@@ -24,6 +24,11 @@ typedef struct MathContext
     size_t     size;
     size_t     capacity;
 
+    struct {
+        FILE* tex_fp;
+        char tex_file_name[MAX_FILENAME_LEN];
+    } debug;
+
 } MathCtx_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -35,7 +40,9 @@ typedef enum MathErr
     MATH_ALLOC_ERROR,
     MATH_TREE_ERROR,
     MATH_UNKNOWN_OP,
-    MATH_INVALID_INPUT
+    MATH_UNKNOWN_TYPE,
+    MATH_INVALID_INPUT,
+    MATH_FILE_ERROR
 } MathErr_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————

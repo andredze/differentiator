@@ -1,26 +1,18 @@
-#ifndef MATH_EXPR_H
-#define MATH_EXPR_H
+#ifndef MATH_DIFF_H
+#define MATH_DIFF_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#include "tree_commands.h"
 #include "math_types.h"
+#include "math_funcs.h"
 #include "math_tex.h"
+#include <math.h>
+#include <stdlib.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathCtxCtor           (MathCtx_t* math_ctx, size_t vars_capacity);
-MathErr_t MathVarsTableRealloc  (MathCtx_t* math_ctx);
-MathErr_t MathCtxDtor           (MathCtx_t* math_ctx);
-
-size_t GetHash(const char* str);
-
-int VarCaseCompare(const void* par1, const void* par2);
+MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-const int VARS_MIN_COUNT = 64;
-
-//——————————————————————————————————————————————————————————————————————————————————————————
-
-#endif /* MATH_EXPR_H */
+#endif /* MATH_DIFF_H */
