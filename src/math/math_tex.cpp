@@ -10,6 +10,8 @@ static void MathTexDumpNode     (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpUnaryOp  (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpData     (MathData_t  data, MathCtx_t* math_ctx);
 
+static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket);
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 static FILE* fp = NULL;
@@ -174,6 +176,8 @@ static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
         return;
     }
 
+    MathTexDumpBracketIfNeeded(node, '(');
+
     if (node->left != NULL)
         MathTexDumpNode(node->left, math_ctx);
 
@@ -181,6 +185,20 @@ static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
     if (node->right != NULL)
         MathTexDumpNode(node->right, math_ctx);
+
+    MathTexDumpBracketIfNeeded(node, ')');
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket)
+{
+    // TODO: if (node->parent->data.value.op == OP_MUL || OP_DIV)
+    if (node->data.type != TYPE_OP)
+        return;
+
+    if (node->data.value.op == OP_ADD || node->data.value.op == OP_SUB)
+        fprintf(fp, "%c", bracket);
 }
 
 //------------------------------------------------------------------------------------------
