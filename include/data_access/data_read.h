@@ -11,6 +11,8 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+TreeErr_t TreeReadInputData(MathCtx_t* math_ctx);
+
 TreeErr_t TreeReadData  (MathCtx_t* math_ctx, const char* data_file_path);
 TreeErr_t ReadNode      (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode);
 TreeErr_t ReadNodeData  (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, MathData_t* data);

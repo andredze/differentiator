@@ -18,6 +18,25 @@
 
 //------------------------------------------------------------------------------------------
 
+TreeErr_t TreeReadInputData(MathCtx_t* math_ctx)
+{
+    char file_path[MAX_FILENAME_LEN] = {};
+
+    printf("Enter database file path: ");
+
+    if (scanf("%s", file_path) != 1)
+    {
+        PRINTERR("scanf failed");
+        return TREE_INVALID_INPUT;
+    }
+
+    getchar();
+
+    return TreeReadData(math_ctx, file_path);
+}
+
+//------------------------------------------------------------------------------------------
+
 TreeErr_t TreeReadData(MathCtx_t* math_ctx, const char* data_file_path)
 {
     DEBUG_TREE_CHECK(&math_ctx->tree, "ERROR BEFORE TREE READ DATA");

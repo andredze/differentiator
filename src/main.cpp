@@ -21,7 +21,7 @@ int main()
         if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
-        if (TreeReadData(&math_ctx, "data/sin.txt"))
+        if (TreeReadInputData(&math_ctx))
             break;
 
         if (MathCtxTexDump(&math_ctx, "Main dump"))

@@ -126,15 +126,15 @@ R"(\documentclass[12pt, a4paper]{article}
 \usepackage[T2A]{fontenc}
 \usepackage[russian]{babel}
 
-\title{Название документа}
-\author{Автор}
+\title{ХУИТА (МАТАН)}
+\author{Киселев Андрей}
 \date{\today}
 
 \begin{document}
 
 \maketitle
 
-\section{Первая секция})");
+\section{Исходное выражение})");
 
 }
 

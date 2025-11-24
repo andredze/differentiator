@@ -36,7 +36,7 @@ MathErr_t MathVarsTableRealloc(MathCtx_t* math_ctx)
     }
 
     math_ctx->vars_table = vars_table;
-    math_ctx->capacity = new_cap;
+    math_ctx->capacity   = new_cap;
 
     return MATH_SUCCESS;
 }
