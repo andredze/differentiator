@@ -79,9 +79,9 @@ MathErr_t MathCtxDtor(MathCtx_t* math_ctx)
 
     free(math_ctx->vars_table);
 
-    math_ctx->vars_table    = NULL;
-    math_ctx->capacity = 0;
-    math_ctx->size     = 0;
+    math_ctx->vars_table = NULL;
+    math_ctx->capacity   = 0;
+    math_ctx->size       = 0;
 
     TreeDtor(&math_ctx->tree);
 

@@ -21,7 +21,6 @@ CXXFLAGS += -I include -I include/tree -I include/data_access -I include/math
 
 SOURCES = src/main.cpp 						\
           src/data_access/data_read.cpp 	\
-          src/data_access/data_write.cpp 	\
           src/tree/tree_commands.cpp 		\
           src/tree/tree_debug.cpp 			\
           src/colors.cpp					\

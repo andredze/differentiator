@@ -280,22 +280,6 @@ MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData
 
 //------------------------------------------------------------------------------------------
 
-int CompareDoubles(double val1, double val2)
-{
-    if (val1 + DOUBLE_EPS < val2 - DOUBLE_EPS)
-    {
-        return -1;
-    }
-    else if (val2 + DOUBLE_EPS < val1 - DOUBLE_EPS)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-//------------------------------------------------------------------------------------------
-
 void SkipSpaces(char* buffer, ssize_t* pos)
 {
     assert(buffer != NULL);

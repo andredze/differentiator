@@ -28,15 +28,10 @@ MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-int  CompareDoubles  (double val1, double val2);
 int  SkipLetter      (char* buffer, ssize_t* pos, char letter);
 int  ReadFile        (FILE* fp, char** buffer_ptr, const char* file_path);
 int  CountSize       (const char* file_path, size_t* size);
 void SkipSpaces      (char* buffer, ssize_t* pos);
-
-//——————————————————————————————————————————————————————————————————————————————————————————
-
-const double DOUBLE_EPS = 1e-7;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

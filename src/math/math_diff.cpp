@@ -244,16 +244,10 @@ static TreeNode_t* MathDiffDeg(MathCtx_t* math_ctx, TreeNode_t* node, size_t dif
      = e^(ln(f)*g) * d/dx (ln(f)*g)
      = e^(ln(f)*g) * ( g * d/dx(f) * 1/f +  ln(f) * d/dx(g) ) */
 
-    return MUL_(
-                EXP_(MUL_(LN_(cL), cR)),
-                ADD_(
-                    MUL_(
-                        MUL_(cR, dL),
-                        DIV_(NUM_(1), cL)
-                        ),
-                    MUL_(LN_(cL), dR)
-                    )
-                );
+    return MUL_(EXP_(MUL_(LN_(cL), cR)),
+                ADD_(MUL_(MUL_(cR, dL),
+                          DIV_(NUM_(1), cL)),
+                     MUL_(LN_(cL), dR)));
 }
 
 //==========================================================================================

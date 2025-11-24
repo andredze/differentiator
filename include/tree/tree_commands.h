@@ -65,6 +65,12 @@ TreeErr_t TreeCheck(const Tree_t* tree,
                     const char*   fmt, ...);
 #endif /* TREE_DEBUG */
 
+int  CompareDoubles  (double val1, double val2);
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+const double DOUBLE_EPS = 1e-7;
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #endif /* TREE_H */

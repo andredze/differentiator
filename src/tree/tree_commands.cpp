@@ -284,3 +284,19 @@ TreeErr_t TreeVerify(const Tree_t* tree)
 }
 
 //------------------------------------------------------------------------------------------
+
+int CompareDoubles(double val1, double val2)
+{
+    if (val1 + DOUBLE_EPS < val2 - DOUBLE_EPS)
+    {
+        return -1;
+    }
+    else if (val2 + DOUBLE_EPS < val1 - DOUBLE_EPS)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+//------------------------------------------------------------------------------------------

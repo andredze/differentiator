@@ -6,11 +6,11 @@ static void TexDumpTitle    ();
 static void TexDumpEnding   ();
 static void TexConvertToPdf ();
 
-static void MathTexDumpNode     (TreeNode_t* node, MathCtx_t* math_ctx);
-static void MathTexDumpUnaryOp  (TreeNode_t* node, MathCtx_t* math_ctx);
-static void MathTexDumpData     (MathData_t  data, MathCtx_t* math_ctx);
-
-static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket);
+static void MathTexDumpNode             (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpUnaryOp          (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpData             (MathData_t  data, MathCtx_t* math_ctx);
+static void MathTexDumpBracketIfNeeded  (TreeNode_t* node, char bracket);
+static void MathTexDumpNumber           (double num);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -207,10 +207,13 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);
 
+    // NOTE: предварительное решение
+    // TODO: проверять приоритеты с помощью узлов родителя
+
     switch (data.type)
     {
         case TYPE_NUM:
-            fprintf(fp, "%lg ", data.value.num);
+            MathTexDumpNumber(data.value.num);
             break;
 
         case TYPE_OP:
@@ -239,6 +242,24 @@ static void MathTexDumpUnaryOp(TreeNode_t* node, MathCtx_t* math_ctx)
     MathTexDumpNode(node->right, math_ctx);
 
     fprintf(fp, ")");
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexDumpNumber(double num)
+{
+    if (CompareDoubles(num, EULER_NUMBER) == 0)
+    {
+        fprintf(fp, "e ", num);
+    }
+    else if (CompareDoubles(num, PI_NUMBER) == 0)
+    {
+        fprintf(fp, "\\pi  ", num);
+    }
+    else
+    {
+        fprintf(fp, "%lg ", num);
+    }
 }
 
 //------------------------------------------------------------------------------------------
