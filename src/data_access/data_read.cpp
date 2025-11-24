@@ -255,6 +255,12 @@ MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData
             return error;
     }
 
+    for (size_t i = 0; i < math_ctx->size; i++)
+    {
+        if (strncmp(math_ctx->vars_table[i].str, str, str_len) == 0)
+            return MATH_SUCCESS;
+    }
+
     char* var_str = strndup(str, str_len);
 
     if (var_str == NULL)
