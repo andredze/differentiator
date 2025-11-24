@@ -7,10 +7,14 @@ static void TexDumpEnding   ();
 static void TexConvertToPdf ();
 
 static void MathTexDumpNode             (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpNodeInorder      (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpNodeDivCase      (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpUnaryOp          (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpData             (MathData_t  data, MathCtx_t* math_ctx);
 static void MathTexDumpBracketIfNeeded  (TreeNode_t* node, char bracket);
+static void MathTexDumpBraceIfNeeded    (TreeNode_t* node, char bracket);
 static void MathTexDumpNumber           (double num);
+static int  MathNodeMatchesOp           (TreeNode_t* node, MathOp_t op);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -164,6 +168,8 @@ static void TexConvertToPdf()
 
 static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
 {
+    assert(math_ctx != NULL);
+
     if (node == NULL)
     {
         PRINTERR("Node is a nullptr");
@@ -176,6 +182,40 @@ static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
         return;
     }
 
+    if (MathNodeMatchesOp(node, OP_DIV))
+        MathTexDumpNodeDivCase(node, math_ctx);
+    else
+        MathTexDumpNodeInorder(node, math_ctx);
+}
+
+//------------------------------------------------------------------------------------------
+
+static int MathNodeMatchesOp(TreeNode_t* node, MathOp_t op)
+{
+    return node->data.type == TYPE_OP && node->data.value.op == op;
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexDumpNodeDivCase(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    fprintf(fp, "\\frac{");
+
+    if (node->left != NULL)
+        MathTexDumpNode(node->left, math_ctx);
+
+    fprintf(fp, "}{");
+
+    if (node->right != NULL)
+        MathTexDumpNode(node->right, math_ctx);
+
+    fprintf(fp, "}");
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexDumpNodeInorder(TreeNode_t* node, MathCtx_t* math_ctx)
+{
     MathTexDumpBracketIfNeeded(node, '(');
 
     if (node->left != NULL)
@@ -183,8 +223,12 @@ static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
     MathTexDumpData(node->data, math_ctx);
 
+    MathTexDumpBraceIfNeeded(node, '{');
+
     if (node->right != NULL)
         MathTexDumpNode(node->right, math_ctx);
+
+    MathTexDumpBraceIfNeeded(node, '}');
 
     MathTexDumpBracketIfNeeded(node, ')');
 }
@@ -197,7 +241,19 @@ static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket)
     if (node->data.type != TYPE_OP)
         return;
 
-    if (node->data.value.op == OP_ADD || node->data.value.op == OP_SUB)
+    if (node->data.value.op == OP_ADD ||
+        node->data.value.op == OP_SUB)
+        fprintf(fp, "%c", bracket);
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexDumpBraceIfNeeded(TreeNode_t* node, char bracket)
+{
+    if (node->data.type != TYPE_OP)
+        return;
+
+    if (node->data.value.op == OP_DEG)
         fprintf(fp, "%c", bracket);
 }
 
