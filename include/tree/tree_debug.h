@@ -13,33 +13,24 @@
 
 int TreePrintElement(const TreeElem_t* data);
 
-TreeErr_t TreeReadBufferDump(const char* buffer,
-                             ssize_t pos,
-                             const char* fmt, ...);
+TreeErr_t TreeReadBufferDump(const char* buffer, ssize_t pos, const char* fmt, ...);
 
 MathErr_t MathVarsTableDump(const MathCtx_t* math_ctx, const char* fmt, ...);
 
-TreeErr_t TreeDump(MathCtx_t* math_ctx,
+TreeErr_t TreeDump(MathCtx_t*      math_ctx,
                    const TreeDumpInfo_t* dump_info,
                    const char* fmt, ...);
 
-TreeErr_t vTreeDump(MathCtx_t* math_ctx,
+TreeErr_t vTreeDump(MathCtx_t*      math_ctx,
                     const TreeDumpInfo_t* dump_info,
                     const char* fmt, va_list args);
 
-TreeErr_t TreeOpenLogFile(FILE** fp_ptr, int* calls_count_ptr, char* dest_log_dir);
+TreeErr_t TreeOpenLogFile   ();
+void      TreeCloseLogFile  ();
 
-TreeErr_t TreeGraphDump(MathCtx_t* math_ctx,
-                        const char* graph_name,
-                        const char* log_dir);
-
-void SetGraphFilepaths(char*       dot_file_path,
-                       char*       svg_file_path,
-                       const char* log_dir,
-                       const char* graph_name);
-
-TreeErr_t TreeConvertGraphFile(const char* dot_file_path,
-                               const char* svg_file_path);
+TreeErr_t TreeGraphDump        (MathCtx_t*       math_ctx);
+void      SetGraphFilepaths    ();
+TreeErr_t TreeConvertGraphFile ();
 
 void      DumpGraphTitle      (FILE* dot_file);
 void      TreeNodePrint       (const TreeNode_t* node          );
@@ -50,7 +41,6 @@ int       DumpTreeVarNode     (const TreeNode_t* node, FILE* fp, MathCtx_t* math
 int       DumpTreeEdges       (const TreeNode_t* node, FILE* fp);
 int       DumpTreeOpNode      (const TreeNode_t* node, FILE* fp);
 int       DumpTreeNumNode     (const TreeNode_t* node, FILE* fp);
-int       SetDirectories      (char* log_filename, char* log_dir);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -95,6 +85,8 @@ int PrintArg(
 const int MAX_NODE_NAME_LEN = 32;
 const int MAX_LABEL_LEN     = 256;
 const int MAX_DATA_LEN      = 128;
+
+const char* const IMAGE_FILE_TYPE = "svg";
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

@@ -4,11 +4,11 @@
 
 #ifdef TREE_DEBUG
 
-TreeErr_t TreeCheck(const Tree_t* tree,
-                    const char*   func,
-                    const char*   file,
-                    int           line,
-                    const char*   fmt, ...)
+TreeErr_t TreeCheck(MathCtx_t*  math_ctx,
+                    const char* func,
+                    const char* file,
+                    int         line,
+                    const char* fmt, ...)
 {
     assert(func != NULL);
     assert(file != NULL);
@@ -16,19 +16,19 @@ TreeErr_t TreeCheck(const Tree_t* tree,
 
     TreeErr_t verify_status = TREE_SUCCESS;
 
-    if ((verify_status = TreeVerify(tree)))
+    if ((verify_status = TreeVerify(&math_ctx->tree)))
     {
         PRINTERR("%s (TreeVerify not passed! Check \"tree.html\")", TREE_STR_ERRORS[verify_status]);
 
-        // TreeDumpInfo_t dump_info = {verify_status, func, file, line};
+        TreeDumpInfo_t dump_info = {verify_status, func, file, line};
 
         va_list args = {};
         va_start(args, fmt);
 
-        // if (vTreeDump(tree, &dump_info, fmt, args))
-        // {
-        //     return TREE_DUMP_ERROR;
-        // }
+        if (vTreeDump(math_ctx, &dump_info, fmt, args))
+        {
+            return TREE_DUMP_ERROR;
+        }
 
         va_end(args);
     }
@@ -59,7 +59,7 @@ TreeErr_t TreeCtor(Tree_t* tree)
     tree->buffer = NULL;
     tree->size   = 0;
 
-    DEBUG_TREE_CHECK(tree, "ERROR DUMP AFTER CTOR");
+    // DEBUG_TREE_CHECK(tree, "ERROR DUMP AFTER CTOR");
     DPRINTF("> TreeCtor   END\n");
 
     return TREE_SUCCESS;

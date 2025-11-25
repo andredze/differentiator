@@ -41,9 +41,9 @@ static MathErr_t MathGetVarValues(MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);
 
-    for (size_t i = 0; i < math_ctx->size; i++)
+    for (size_t i = 0; i < math_ctx->vars.size; i++)
     {
-        printf("Введите значение переменной %s: ", math_ctx->vars_table[i].str);
+        printf("Введите значение переменной %s: ", math_ctx->vars.data[i].str);
 
         double variable = 0.0;
 
@@ -55,7 +55,7 @@ static MathErr_t MathGetVarValues(MathCtx_t* math_ctx)
 
         getchar();
 
-        math_ctx->vars_table[i].value = variable;
+        math_ctx->vars.data[i].value = variable;
     }
 
     return MATH_SUCCESS;
@@ -76,7 +76,7 @@ static MathErr_t MathEvalNode(MathCtx_t* math_ctx, TreeNode_t* node, double* res
             return MATH_SUCCESS;
 
         case TYPE_VAR:
-            *result = math_ctx->vars_table[node->data.value.var].value;
+            *result = math_ctx->vars.data[node->data.value.var].value;
             return MATH_SUCCESS;
 
         case TYPE_OP:
@@ -196,6 +196,14 @@ static MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
             *result = pow(left_result, right_result);
             break;
 
+        case OP_SIN:
+        case OP_COS:
+        case OP_TG:
+        case OP_CTG:
+        case OP_LN:
+            PRINTERR("Given operation is unary");
+            return MATH_UNKNOWN_OP;
+
         default:
             PRINTERR("Unknown binary op");
             return MATH_UNKNOWN_OP;
@@ -233,6 +241,14 @@ static MathErr_t MathExecuteUnaryOperation(MathOp_t operation,
         case OP_LN:
             *result = log(argument);
             break;
+
+        case OP_ADD:
+        case OP_SUB:
+        case OP_MUL:
+        case OP_DIV:
+        case OP_DEG:
+            PRINTERR("Given operation is binary");
+            return MATH_UNKNOWN_OP;
 
         default:
             PRINTERR("Unknown unary op");

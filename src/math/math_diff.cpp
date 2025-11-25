@@ -107,14 +107,7 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
     assert(dest_math_ctx != NULL);
     assert(src_math_ctx  != NULL);
 
-    // TODO: DEBUG_MATH_CTX_CHECK(src_math_ctx);
-
-    size_t var_hash = GetHash(str_var);
-
-    qsort(src_math_ctx->vars_table,
-          src_math_ctx->size,
-          sizeof(src_math_ctx->vars_table[0]),
-          VarCaseCompare);
+    DEBUG_TREE_CHECK(src_math_ctx, "MATH_DIFF");
 
     char* copy_str_var = strdup(str_var);
 
@@ -124,17 +117,17 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
         return MATH_ALLOC_ERROR;
     }
 
-    VarCase_t var_case = { .str = copy_str_var, .hash = var_hash };
+    VarCase_t var_case  = { .str = copy_str_var };
+    size_t    var_index = 0;
 
-    VarCase_t* var_case_p = (VarCase_t*) bsearch(&var_case, src_math_ctx->vars_table,
-                                                 src_math_ctx->size,
-                                                 sizeof(src_math_ctx->vars_table[0]),
-                                                 VarCaseCompare);
+    for (size_t i = 0; i < src_math_ctx->vars.size; i++)
+    {
+        if (strcmp(copy_str_var, src_math_ctx->vars.data[i].str) == 0)
+            var_index = i;
+    }
 
-    size_t var_index = (size_t) (var_case_p - src_math_ctx->vars_table);
-
-    dest_math_ctx->vars_table[0] = var_case;
-    dest_math_ctx->size = 1;
+    dest_math_ctx->vars.data[0] = var_case;
+    dest_math_ctx->vars.size = 1;
 
     TreeNode_t* root = MathDiffNode(dest_math_ctx, src_math_ctx->tree.dummy->right, var_index);
 

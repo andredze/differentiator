@@ -100,7 +100,36 @@ typedef struct TreeNode
     TreeNode*  left;
     TreeNode*  right;
 
+    TreeNode*  parent;
+
 } TreeNode_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+const int MAX_FILE_PATH_LEN = 256;
+const int MAX_DIR_PATH_LEN  = 100;
+const int MAX_FILE_NAME_LEN = 120;
+const int MAX_STR_TIME_LEN  = 64;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef struct TreeDebugData
+{
+    FILE* fp;
+
+    char log_file_path   [MAX_FILE_PATH_LEN];
+    char graph_file_name [MAX_FILE_NAME_LEN];
+    char img_file_path   [MAX_FILE_PATH_LEN];
+    char dot_file_path   [MAX_FILE_PATH_LEN];
+
+    int graphs_count;
+
+    char str_time [MAX_STR_TIME_LEN];
+    char log_dir  [MAX_DIR_PATH_LEN];
+    char img_dir  [MAX_DIR_PATH_LEN];
+    char dot_dir  [MAX_DIR_PATH_LEN];
+
+} TreeDebugData_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -108,7 +137,9 @@ typedef struct Tree
 {
     TreeNode_t* dummy; // null (fake) element
     size_t      size;
-    char*       buffer;
+
+    char* buffer;
+
 } Tree_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -122,9 +153,9 @@ typedef enum TreeErr
 
     TREE_CALLOC_ERROR      = 4,
     TREE_DUMP_ERROR        = 5,
-    TREE_SYSTEM_FUNC_ERR   = 6,
-    TREE_FILE_ERR          = 7,
-    TREE_STACK_ERR         = 8,
+    TREE_SYSTEM_FUNC_ERROR = 6,
+    TREE_FILE_ERROR        = 7,
+    TREE_STACK_ERROR       = 8,
 
     TREE_INVALID_INPUT     = 9
 } TreeErr_t;
@@ -139,9 +170,9 @@ const char* const TREE_STR_ERRORS[] =
     [TREE_LOOP]               = "Tree is looped",
     [TREE_CALLOC_ERROR]       = "Memory allocation for tree failed",
     [TREE_DUMP_ERROR]         = "Error with dumping tree",
-    [TREE_SYSTEM_FUNC_ERR]    = "System function failed",
-    [TREE_FILE_ERR]           = "Error with opening/writing to file",
-    [TREE_STACK_ERR]          = "Error with stack commands",
+    [TREE_SYSTEM_FUNC_ERROR]  = "System function failed",
+    [TREE_FILE_ERROR]         = "Error with opening/writing to file",
+    [TREE_STACK_ERROR]        = "Error with stack commands",
     [TREE_INVALID_INPUT]      = "User input is invalid"
 };
 

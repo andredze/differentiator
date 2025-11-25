@@ -20,7 +20,7 @@
                                                 (fmt), ##__VA_ARGS__);  \
         if ((tree_check_status != TREE_SUCCESS))                        \
         {                                                               \
-            return tree_check_status;                                   \
+            return MATH_TREE_ERROR;                                     \
         }                                                               \
         END
 
@@ -29,7 +29,7 @@
         TreeDumpInfo_t dump_info = {TREE_SUCCESS, __PRETTY_FUNCTION__, __FILE__, __LINE__}; \
         if (TreeDump((tree_ptr), &dump_info, (fmt), ##__VA_ARGS__))                         \
         {                                                                                   \
-            return TREE_DUMP_ERROR;                                                         \
+            return MATH_TREE_ERROR;                                                         \
         }                                                                                   \
         END
 
@@ -58,11 +58,11 @@ TreeErr_t TreeRightSubtreeDtor (TreeNode_t*  node    );
 TreeErr_t TreeSubtreeDtor      (TreeNode_t** node_ptr);
 
 #ifdef TREE_DEBUG
-TreeErr_t TreeCheck(const Tree_t* tree,
-                    const char*   func,
-                    const char*   file,
-                    int           line,
-                    const char*   fmt, ...);
+TreeErr_t TreeCheck(MathCtx_t*  math_ctx,
+                    const char* func,
+                    const char* file,
+                    int         line,
+                    const char* fmt, ...);
 #endif /* TREE_DEBUG */
 
 int  CompareDoubles  (double val1, double val2);

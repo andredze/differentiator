@@ -11,6 +11,8 @@ int main()
     MathCtx_t math_ctx = {};
     MathCtx_t diff_math_ctx = {};
 
+    TreeOpenLogFile();
+
     do {
         if (MathOpenTexFile())
             break;
@@ -45,6 +47,8 @@ int main()
     MathCloseTexFile();
     MathCtxDtor(&diff_math_ctx);
     MathCtxDtor(&math_ctx);
+
+    TreeCloseLogFile();
 
     return EXIT_SUCCESS;
 }

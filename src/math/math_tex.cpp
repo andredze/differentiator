@@ -277,7 +277,7 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
             break;
 
         case TYPE_VAR:
-            fprintf(fp, "%s ", math_ctx->vars_table[data.value.var].str);
+            fprintf(fp, "%s ", math_ctx->vars.data[data.value.var].str);
             break;
 
         default:
@@ -306,11 +306,11 @@ static void MathTexDumpNumber(double num)
 {
     if (CompareDoubles(num, EULER_NUMBER) == 0)
     {
-        fprintf(fp, "e ", num);
+        fprintf(fp, "e ");
     }
     else if (CompareDoubles(num, PI_NUMBER) == 0)
     {
-        fprintf(fp, "\\pi  ", num);
+        fprintf(fp, "\\pi  ");
     }
     else
     {
