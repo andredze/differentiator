@@ -45,17 +45,18 @@
 TreeErr_t TreeVerify           (const Tree_t* tree);
 TreeErr_t TreeCtor             (Tree_t*     tree);
 
-TreeNode_t* TreeNodeCtor       (Tree_t* tree, MathData_t data, TreeNode_t* left, TreeNode_t* right);
+TreeNode_t* TreeNodeCtor       (Tree_t* tree, MathData_t data, TreeNode_t* left, TreeNode_t* right, TreeNode_t* parent);
 TreeErr_t   TreeGetData        (TreeNode_t* node, MathDataType_t type, MathData_t data);
-TreeNode_t* TreeCopySubtree    (Tree_t* dest_tree, TreeNode_t* node);
+TreeNode_t* TreeCopySubtree    (Tree_t* dest_tree, TreeNode_t* node, TreeNode_t* parent);
 TreeErr_t   TreeDtor           (Tree_t*     tree);
 
-TreeErr_t TreeNodeVerify       (const Tree_t* tree, TreeNode_t* node, size_t* calls_count);
-TreeErr_t TreeSingleNodeDtor   (TreeNode_t*  node    );
-TreeErr_t TreeNodeDtor         (TreeNode_t*  node    );
-TreeErr_t TreeLeftSubtreeDtor  (TreeNode_t*  node    );
-TreeErr_t TreeRightSubtreeDtor (TreeNode_t*  node    );
-TreeErr_t TreeSubtreeDtor      (TreeNode_t** node_ptr);
+TreeErr_t TreeNodeVerify       (const Tree_t* tree, TreeNode_t* node, size_t* calls_count, TreeNode_t* parent);
+TreeErr_t TreeSingleNodeDtor   (TreeNode_t*  node    , Tree_t* tree);
+TreeErr_t TreeNodeDtor         (TreeNode_t*  node    , Tree_t* tree);
+TreeErr_t TreeSubtreesDtor     (TreeNode_t*  node    , Tree_t* tree);
+TreeErr_t TreeLeftSubtreeDtor  (TreeNode_t*  node    , Tree_t* tree);
+TreeErr_t TreeRightSubtreeDtor (TreeNode_t*  node    , Tree_t* tree);
+TreeErr_t TreeSubtreeDtor      (TreeNode_t** node_ptr, Tree_t* tree);
 
 #ifdef TREE_DEBUG
 TreeErr_t TreeCheck(MathCtx_t*  math_ctx,

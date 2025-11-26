@@ -643,8 +643,8 @@ int DumpTreeDefaultNode(const TreeNode_t* node,
 
     char label[MAX_LABEL_LEN] = "";
 
-    snprintf(label, MAX_LABEL_LEN, "{ %p | %s | { left = %p | right = %p }}",
-                                   node, str_data, node->left, node->right);
+    snprintf(label, MAX_LABEL_LEN, "{ %p | %s | parent = %p | { left = %p | right = %p }}",
+                                   node, str_data, node->parent, node->left, node->right);
 
     DumpNode(name, label, color, fillcolor, fontcolor, shape, fp);
 

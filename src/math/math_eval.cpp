@@ -7,11 +7,7 @@ static MathErr_t MathEvalNode              (MathCtx_t* math_ctx, TreeNode_t* nod
 static MathErr_t MathEvalNodeOpCase        (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
 static MathErr_t MathEvalNodeUnaryOpCase   (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
 static MathErr_t MathEvalNodeBinaryOpCase  (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
-
-static MathErr_t MathExecuteBinaryOperation(MathOp_t operation, double left_result,
-                                            double right_result, double* result);
-
-static MathErr_t MathExecuteUnaryOperation(MathOp_t operation, double argument, double* result);
+static MathErr_t MathExecuteUnaryOperation (MathOp_t operation,  double argument,  double* result);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -167,10 +163,10 @@ static MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node,
 
 //------------------------------------------------------------------------------------------
 
-static MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
-                                            double  left_result,
-                                            double  right_result,
-                                            double* result)
+MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
+                                     double  left_result,
+                                     double  right_result,
+                                     double* result)
 {
     assert(result != NULL);
 

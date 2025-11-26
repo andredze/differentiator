@@ -77,7 +77,7 @@ void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
 void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx)
 {
     fprintf(fp, "\n\\[");
-    fprintf(fp, R"(\frac{d}{dx})""(");
+    fprintf(fp, R"(\frac{d}{d%s})""(", math_ctx->vars.data[0].str);
 
     // TODO: как не терять переменные??? нужно хранить еще и src_mathctx????
 

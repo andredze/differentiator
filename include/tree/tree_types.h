@@ -157,7 +157,10 @@ typedef enum TreeErr
     TREE_FILE_ERROR        = 7,
     TREE_STACK_ERROR       = 8,
 
-    TREE_INVALID_INPUT     = 9
+    TREE_INVALID_INPUT     = 9,
+    TREE_DTOR_ERROR        = 10,
+    TREE_LOST_CONNECTION   = 11
+
 } TreeErr_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -173,7 +176,9 @@ const char* const TREE_STR_ERRORS[] =
     [TREE_SYSTEM_FUNC_ERROR]  = "System function failed",
     [TREE_FILE_ERROR]         = "Error with opening/writing to file",
     [TREE_STACK_ERROR]        = "Error with stack commands",
-    [TREE_INVALID_INPUT]      = "User input is invalid"
+    [TREE_INVALID_INPUT]      = "User input is invalid",
+    [TREE_DTOR_ERROR]         = "Error with destroying tree",
+    [TREE_LOST_CONNECTION]    = "Tree node->parent doesn't match actual parent"
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————

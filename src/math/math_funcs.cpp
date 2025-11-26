@@ -45,6 +45,8 @@ MathErr_t MathVarsTableRealloc(MathCtx_t* math_ctx)
 
 MathErr_t MathCtxDtor(MathCtx_t* math_ctx)
 {
+    DPRINTF("Destroying %p:\n", math_ctx);
+
     if (math_ctx == NULL)
     {
         PRINTERR("MathCtx is a nullptr");

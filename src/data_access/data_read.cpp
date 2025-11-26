@@ -64,7 +64,7 @@ MathErr_t TreeReadData(MathCtx_t* math_ctx, const char* data_file_path)
     ssize_t i = 0;
     MathErr_t error = MATH_SUCCESS;
 
-    if ((error = ReadNode(math_ctx, buffer, &i, &math_ctx->tree.dummy->right)))
+    if ((error = ReadNode(math_ctx, buffer, &i, &math_ctx->tree.dummy->right, math_ctx->tree.dummy)))
         return error;
 
     DEBUG_TREE_CHECK(math_ctx, "ERROR AFTER TREE READ DATA");
@@ -76,7 +76,7 @@ MathErr_t TreeReadData(MathCtx_t* math_ctx, const char* data_file_path)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t ReadNode(MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode)
+MathErr_t ReadNode(MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode, TreeNode_t* parent)
 {
     assert(math_ctx != NULL);
     assert(buffer   != NULL);
@@ -99,16 +99,16 @@ MathErr_t ReadNode(MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t**
 
         TREE_READ_BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((*pnode = TreeNodeCtor(&math_ctx->tree, data, NULL, NULL)) == NULL)
+        if ((*pnode = TreeNodeCtor(&math_ctx->tree, data, NULL, NULL, parent)) == NULL)
             return MATH_NULL;
 
         TREE_CALL_DUMP(math_ctx, "DUMP AFTER NODE CTOR %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->left)))
+        if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->left, *pnode)))
             return error;
         TREE_READ_BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING NODE LEFT TO %s", TYPE_CASES_TABLE[data.type].name);
 
-        if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->right)))
+        if ((error = ReadNode(math_ctx, buffer, pos, &(*pnode)->right, *pnode)))
             return error;
         TREE_READ_BUFFER_DUMP(buffer, *pos, "BUFFER DUMP AFTER READING NODE RIGHT TO %s", TYPE_CASES_TABLE[data.type].name);
 

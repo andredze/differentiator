@@ -3,6 +3,7 @@
 #include "math_funcs.h"
 #include "math_eval.h"
 #include "math_diff.h"
+#include "math_simplify.h"
 
 //------------------------------------------------------------------------------------------
 
@@ -20,16 +21,25 @@ int main()
         if (MathCtxCtor(&math_ctx, 0))
             break;
 
-        if (MathCtxCtor(&diff_math_ctx, 0))
+        if (TreeReadInputData(&math_ctx))
             break;
 
-        if (TreeReadInputData(&math_ctx))
+        if (MathConvoluteConsts(&math_ctx))
+            break;
+
+        if (MathDeleteNeutral(&math_ctx))
+            break;
+
+        if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
         if (MathCtxTexDump(&math_ctx, "Main dump"))
             break;
 
         if (MathDifferentiate(&math_ctx, &diff_math_ctx, "x"))
+            break;
+
+        if (MathConvoluteConsts(&diff_math_ctx))
             break;
 
         if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))

@@ -1,22 +1,18 @@
-#ifndef MATH_EXPR_H
-#define MATH_EXPR_H
+#ifndef MATH_SIMPLIFY_H
+#define MATH_SIMPLIFY_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#include "tree_commands.h"
 #include "math_types.h"
-#include "math_tex.h"
+#include "math_eval.h"
+#include "tree_types.h"
+#include "tree_commands.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathCtxCtor           (MathCtx_t* math_ctx, size_t vars_capacity);
-MathErr_t MathVarsTableRealloc  (MathCtx_t* math_ctx);
-MathErr_t MathCtxDtor           (MathCtx_t* math_ctx);
+MathErr_t MathDeleteNeutral     (MathCtx_t* math_ctx);
+MathErr_t MathConvoluteConsts   (MathCtx_t* math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-const int VARS_MIN_COUNT = 4;
-
-//——————————————————————————————————————————————————————————————————————————————————————————
-
-#endif /* MATH_EXPR_H */
+#endif /* MATH_SIMPLIFY_H */

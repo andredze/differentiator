@@ -48,7 +48,7 @@ TreeErr_t TreeCtor(Tree_t* tree)
         return TREE_NULL;
     }
 
-    tree->dummy = TreeNodeCtor(tree, {TYPE_NUM, { .num = 0 }}, NULL, NULL);
+    tree->dummy = TreeNodeCtor(tree, {TYPE_NUM, { .num = 0 }}, NULL, NULL, NULL);
 
     if (tree->dummy == NULL)
     {
@@ -57,7 +57,7 @@ TreeErr_t TreeCtor(Tree_t* tree)
     }
 
     tree->buffer = NULL;
-    tree->size   = 0;
+    tree->size   = 1;
 
     // DEBUG_TREE_CHECK(tree, "ERROR DUMP AFTER CTOR");
     DPRINTF("> TreeCtor   END\n");
@@ -70,7 +70,8 @@ TreeErr_t TreeCtor(Tree_t* tree)
 TreeNode_t* TreeNodeCtor(Tree_t*        tree,
                          TreeElem_t     data,
                          TreeNode_t*    left,
-                         TreeNode_t*    right)
+                         TreeNode_t*    right,
+                         TreeNode_t*    parent)
 {
     if (tree == NULL)
     {
@@ -86,9 +87,10 @@ TreeNode_t* TreeNodeCtor(Tree_t*        tree,
         return NULL;
     }
 
-    node->data  = data;
-    node->left  = left;
-    node->right = right;
+    node->data   = data;
+    node->left   = left;
+    node->right  = right;
+    node->parent = parent;
 
     tree->size++;
 
@@ -97,7 +99,7 @@ TreeNode_t* TreeNodeCtor(Tree_t*        tree,
 
 //------------------------------------------------------------------------------------------
 
-TreeNode_t* TreeCopySubtree(Tree_t* dest_tree, TreeNode_t* node)
+TreeNode_t* TreeCopySubtree(Tree_t* dest_tree, TreeNode_t* node, TreeNode_t* parent)
 {
     DPRINTF("node = %p\n", node);
 
@@ -109,8 +111,9 @@ TreeNode_t* TreeCopySubtree(Tree_t* dest_tree, TreeNode_t* node)
     }
 
     return TreeNodeCtor(dest_tree, node->data,
-                        TreeCopySubtree(dest_tree, node->left),
-                        TreeCopySubtree(dest_tree, node->right));
+                        TreeCopySubtree(dest_tree, node->left, node),
+                        TreeCopySubtree(dest_tree, node->right, node),
+                        parent);
 }
 
 //------------------------------------------------------------------------------------------
@@ -121,7 +124,7 @@ TreeErr_t TreeDtor(Tree_t* tree)
 
     TreeErr_t error = TREE_SUCCESS;
 
-    if ((error = TreeNodeDtor(tree->dummy)))
+    if ((error = TreeNodeDtor(tree->dummy, tree)))
     {
         return error;
     }
@@ -132,30 +135,69 @@ TreeErr_t TreeDtor(Tree_t* tree)
         tree->buffer = NULL;
     }
 
+    if (tree->size != 0)
+    {
+        PRINTERR("Tree size after dtor != 0, size = %zu", tree->size);
+        return TREE_DTOR_ERROR;
+    }
+
     return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeLeftSubtreeDtor(TreeNode_t* node)
+TreeErr_t TreeSubtreesDtor(TreeNode_t* node, Tree_t* tree)
 {
-    assert(node != NULL);
+    TreeErr_t error = TREE_SUCCESS;
 
-    return TreeSubtreeDtor(&node->left);
+    if ((error = TreeLeftSubtreeDtor(node, tree)))
+        return error;
+
+    if ((error = TreeRightSubtreeDtor(node, tree)))
+        return error;
+
+    return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeRightSubtreeDtor(TreeNode_t* node)
+TreeErr_t TreeLeftSubtreeDtor(TreeNode_t* node, Tree_t* tree)
 {
     assert(node != NULL);
 
-    return TreeSubtreeDtor(&node->right);
+    TreeErr_t error = TREE_SUCCESS;
+
+    if ((error = TreeSubtreeDtor(&node->left, tree)))
+    {
+        return error;
+    }
+
+    node->left = NULL;
+
+    return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeSubtreeDtor(TreeNode_t** node_ptr)
+TreeErr_t TreeRightSubtreeDtor(TreeNode_t* node, Tree_t* tree)
+{
+    assert(node != NULL);
+
+    TreeErr_t error = TREE_SUCCESS;
+
+    if ((error = TreeSubtreeDtor(&node->right, tree)))
+    {
+        return error;
+    }
+
+    node->right = NULL;
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeSubtreeDtor(TreeNode_t** node_ptr, Tree_t* tree)
 {
     assert(node_ptr != NULL);
 
@@ -166,7 +208,7 @@ TreeErr_t TreeSubtreeDtor(TreeNode_t** node_ptr)
 
     TreeErr_t error = TREE_SUCCESS;
 
-    if ((error = TreeNodeDtor(*node_ptr)))
+    if ((error = TreeNodeDtor(*node_ptr, tree)))
     {
         return error;
     }
@@ -178,7 +220,7 @@ TreeErr_t TreeSubtreeDtor(TreeNode_t** node_ptr)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeNodeDtor(TreeNode_t* node)
+TreeErr_t TreeNodeDtor(TreeNode_t* node, Tree_t* tree)
 {
     if (node == NULL)
         return TREE_NULL;
@@ -187,17 +229,17 @@ TreeErr_t TreeNodeDtor(TreeNode_t* node)
 
     if (node->left != NULL)
     {
-        if ((error = TreeNodeDtor(node->left)))
+        if ((error = TreeNodeDtor(node->left, tree)))
             return error;
     }
 
     if (node->right != NULL)
     {
-        if ((error = TreeNodeDtor(node->right)))
+        if ((error = TreeNodeDtor(node->right, tree)))
             return error;
     }
 
-    if ((error = TreeSingleNodeDtor(node)))
+    if ((error = TreeSingleNodeDtor(node, tree)))
         return error;
 
     return TREE_SUCCESS;
@@ -205,25 +247,31 @@ TreeErr_t TreeNodeDtor(TreeNode_t* node)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeSingleNodeDtor(TreeNode_t* node)
+TreeErr_t TreeSingleNodeDtor(TreeNode_t* node, Tree_t* tree)
 {
     if (node == NULL)
         return TREE_NULL;
 
-    node->data.type = TYPE_NUM;
+    node->data.type      = TYPE_NUM;
     node->data.value.num = 0;
 
     node->left   = NULL;
     node->right  = NULL;
+    node->parent = NULL;
+
+    cprintf(BLUE, "\t\tfreed ptr %p\n", node);
 
     free(node);
+
+    tree->size--;
 
     return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeNodeVerify(const Tree_t* tree, TreeNode_t* node, size_t* calls_count)
+TreeErr_t TreeNodeVerify(const Tree_t* tree,  TreeNode_t* node,
+                         size_t* calls_count, TreeNode_t* parent)
 {
     assert(calls_count != NULL);
     assert(tree        != NULL);
@@ -232,10 +280,13 @@ TreeErr_t TreeNodeVerify(const Tree_t* tree, TreeNode_t* node, size_t* calls_cou
     {
         return TREE_LOOP;
     }
-
     if (node == NULL)
     {
         return TREE_NULL;
+    }
+    if (node->parent != parent)
+    {
+        return TREE_LOST_CONNECTION;
     }
 
     (*calls_count)++;
@@ -244,13 +295,13 @@ TreeErr_t TreeNodeVerify(const Tree_t* tree, TreeNode_t* node, size_t* calls_cou
 
     if (node->left != NULL)
     {
-        if ((error = TreeNodeVerify(tree, node->left, calls_count)))
+        if ((error = TreeNodeVerify(tree, node->left, calls_count, node)))
             return error;
     }
 
     if (node->right != NULL)
     {
-        if ((error = TreeNodeVerify(tree, node->right, calls_count)))
+        if ((error = TreeNodeVerify(tree, node->right, calls_count, node)))
             return error;
     }
 
@@ -277,7 +328,7 @@ TreeErr_t TreeVerify(const Tree_t* tree)
     size_t calls_count = 0;
     TreeErr_t error = TREE_SUCCESS;
 
-    if ((error = TreeNodeVerify(tree, tree->dummy, &calls_count)))
+    if ((error = TreeNodeVerify(tree, tree->dummy, &calls_count, NULL)))
         return error;
 
     return TREE_SUCCESS;

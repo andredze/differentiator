@@ -14,7 +14,7 @@
 MathErr_t TreeReadInputData(MathCtx_t* math_ctx);
 
 MathErr_t TreeReadData  (MathCtx_t* math_ctx, const char* data_file_path);
-MathErr_t ReadNode      (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode);
+MathErr_t ReadNode      (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, TreeNode_t** pnode, TreeNode_t* parent);
 MathErr_t ReadNodeData  (MathCtx_t* math_ctx, char* buffer, ssize_t* pos, MathData_t* data);
 MathErr_t GetMathData   (MathCtx_t* math_ctx, char* str,  size_t str_len, MathData_t* data);
 
