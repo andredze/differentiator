@@ -87,10 +87,11 @@ TreeNode_t* TreeNodeCtor(Tree_t*        tree,
         return NULL;
     }
 
+    node->parent = parent;
+
     node->data   = data;
     node->left   = left;
     node->right  = right;
-    node->parent = parent;
 
     tree->size++;
 

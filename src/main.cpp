@@ -24,10 +24,7 @@ int main()
         if (TreeReadInputData(&math_ctx))
             break;
 
-        if (MathConvoluteConsts(&math_ctx))
-            break;
-
-        if (MathDeleteNeutral(&math_ctx))
+        if (MathSimplify(&math_ctx))
             break;
 
         if (MathCtxCtor(&diff_math_ctx, 0))
@@ -39,7 +36,7 @@ int main()
         if (MathDifferentiate(&math_ctx, &diff_math_ctx, "x"))
             break;
 
-        if (MathConvoluteConsts(&diff_math_ctx))
+        if (MathSimplify(&diff_math_ctx))
             break;
 
         if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))

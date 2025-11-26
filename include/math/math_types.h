@@ -41,7 +41,8 @@ typedef enum MathErr
     MATH_UNKNOWN_OP,
     MATH_UNKNOWN_TYPE,
     MATH_INVALID_INPUT,
-    MATH_FILE_ERROR
+    MATH_FILE_ERROR,
+    MATH_INVALID_OP
 } MathErr_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -55,7 +56,8 @@ const char* const MATH_STR_ERRORS[] =
     [MATH_UNKNOWN_OP]    = "Error: unknown math operation",
     [MATH_UNKNOWN_TYPE]  = "Error: unknown math data type",
     [MATH_INVALID_INPUT] = "Error with input",
-    [MATH_FILE_ERROR]    = "Error with file operations"
+    [MATH_FILE_ERROR]    = "Error with file operations",
+    [MATH_INVALID_OP]    = "Error: operation not supported"
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————

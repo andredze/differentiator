@@ -2,20 +2,47 @@
 
 /* ===================== Domain Specific Language for simplification ==================== */
 
-#define ISVALUE_(side, number) (node->side->data.type == TYPE_NUM && CompareDoubles(node->side->data.value.num, (number)) == 0)
+#define ISVALUE_(side, number) (node->side->data.type == TYPE_NUM && \
+                                CompareDoubles(node->side->data.value.num, (number)) == 0)
 
 /* ====================================================================================== */
 
 static int       MathNodeIsNum                  (TreeNode_t* node);
+static MathErr_t MathConvoluteNodeToNumber      (TreeNode_t* node, MathCtx_t* math_ctx, double number);
+static MathErr_t MathConvoluteLeftToCurrent     (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteRightToCurrent    (TreeNode_t* node, MathCtx_t* math_ctx);
 static MathErr_t MathDeleteNeutralNode          (TreeNode_t* node, MathCtx_t* math_ctx);
 static MathErr_t MathProcessNeutrals            (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteConnectParent     (TreeNode_t* node, TreeNode_t* new_node);
 static MathErr_t MathProcessNeutralsAddCase     (TreeNode_t* node, MathCtx_t* math_ctx);
 static MathErr_t MathProcessNeutralsSubCase     (TreeNode_t* node, MathCtx_t* math_ctx);
 static MathErr_t MathProcessNeutralsAddSubCase  (TreeNode_t* node, MathCtx_t* math_ctx, MathOp_t op);
 static MathErr_t MathProcessNeutralsMulCase     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathNeutralsConvoluteBranch    (TreeNode_t* node, TreeNode_t* new_node);
+static MathErr_t MathProcessNeutralsDivCase     (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutralsDegCase     (TreeNode_t* node, MathCtx_t* math_ctx);
 static MathErr_t MathConvoluteConstsNode        (TreeNode_t* node, MathCtx_t* math_ctx);
 static MathErr_t MathConvoluteSingleNode        (TreeNode_t* node, MathCtx_t* math_ctx);
+
+//------------------------------------------------------------------------------------------
+
+MathErr_t MathSimplify(MathCtx_t* math_ctx)
+{
+    size_t size_before = 0;
+
+    MathErr_t error = MATH_SUCCESS;
+
+    while (size_before != math_ctx->tree.size)
+    {
+        size_before = math_ctx->tree.size;
+
+        if ((error = MathDeleteNeutral(math_ctx)))
+            return error;
+        if ((error = MathConvoluteConsts(math_ctx)))
+            return error;
+    }
+
+    return MATH_SUCCESS;
+}
 
 //------------------------------------------------------------------------------------------
 
@@ -79,7 +106,6 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
     switch (node->data.value.op)
     {
         case OP_ADD:
-            DPRINTF("\tOP_ADD case\n");
             MathProcessNeutralsAddCase(node, math_ctx);
             break;
 
@@ -92,11 +118,11 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
             break;
 
         case OP_DIV:
-            // MathProcessNeutralsDivCase(node, math_ctx);
+            MathProcessNeutralsDivCase(node, math_ctx);
             break;
 
         case OP_DEG:
-            // MathProcessNeutralsDegCase(node, math_ctx);
+            MathProcessNeutralsDegCase(node, math_ctx);
             break;
 
         case OP_SIN:
@@ -110,6 +136,89 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
     }
 
     MathCtxTexDump(math_ctx, "Deleted neutrals at node %p", node);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t MathConvoluteNodeToNumber(TreeNode_t* node, MathCtx_t* math_ctx, double number)
+{
+    DPRINTF("\tHandling \"convolute node to number %lg\" case\n", number);
+
+    node->data.type      = TYPE_NUM;
+    node->data.value.num = number;
+
+    if (TreeSubtreesDtor(node, &math_ctx->tree))
+        return MATH_TREE_ERROR;
+
+    TREE_CALL_DUMP(math_ctx, "DUMP AFTER \"convolute node to number\" at %p", node);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t MathConvoluteLeftToCurrent(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    DPRINTF("\tHandling \"convolute left to current\" case\n");
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if ((error = MathConvoluteConnectParent(node, node->left)))
+        return error;
+
+    TREE_CALL_DUMP(math_ctx, "DUMP AFTER \"convolute connect parent\" at %p", node);
+
+    TreeSingleNodeDtor(node->right, &math_ctx->tree);
+    TreeSingleNodeDtor(node, &math_ctx->tree);
+
+    TREE_CALL_DUMP(math_ctx, "DUMP AFTER \"convolute left to current\" at %p", node);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t MathConvoluteRightToCurrent(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    DPRINTF("\tHandling \"convolute right to current\" case\n");
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if ((error = MathConvoluteConnectParent(node, node->right)))
+        return error;
+
+    TreeSingleNodeDtor(node->left, &math_ctx->tree);
+    TreeSingleNodeDtor(node, &math_ctx->tree);
+
+    TREE_CALL_DUMP(math_ctx, "DUMP AFTER \"convolute right to current\" at %p", node);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t MathConvoluteConnectParent(TreeNode_t* node, TreeNode_t* new_node)
+{
+    assert(new_node != NULL);
+    assert(node     != NULL);
+
+    new_node->parent = node->parent;
+    DPRINTF("\t\tnode->parent = %p\n", node->parent);
+
+    if (node->parent->left == node)
+    {
+        node->parent->left = new_node;
+        DPRINTF("\t\tnode->parent->left = %p\n", node->parent->left);
+    }
+    else
+    {
+        node->parent->right = new_node;
+        DPRINTF("\t\tnode->parent->right = %p\n", node->parent->right);
+    }
+
+    DPRINTF("\t\tnew_node = %p\n", new_node);
 
     return MATH_SUCCESS;
 }
@@ -135,48 +244,13 @@ static MathErr_t MathProcessNeutralsAddSubCase(TreeNode_t* node, MathCtx_t* math
     assert(node     != NULL);
     assert(math_ctx != NULL);
 
-    MathErr_t error = MATH_SUCCESS;
-
     if (op == OP_ADD && ISVALUE_(left, 0.0))
     {
-        DPRINTF("\tSUB|ADD: Handling \"left value is zero\" case\n");
-
-        if ((error = MathNeutralsConvoluteBranch(node, node->right)))
-            return error;
-
-        TreeSingleNodeDtor(node->left, &math_ctx->tree);
-        TreeSingleNodeDtor(node, &math_ctx->tree);
+        return MathConvoluteRightToCurrent(node, math_ctx);
     }
     else if (ISVALUE_(right, 0.0))
     {
-        DPRINTF("\tSUB|ADD: Handling \"right value is zero\" case\n");
-
-        if ((error = MathNeutralsConvoluteBranch(node, node->left)))
-            return error;
-
-        TreeSingleNodeDtor(node->right, &math_ctx->tree);
-        TreeSingleNodeDtor(node, &math_ctx->tree);
-    }
-
-    return MATH_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------
-
-static MathErr_t MathNeutralsConvoluteBranch(TreeNode_t* node, TreeNode_t* new_node)
-{
-    assert(new_node != NULL);
-    assert(node     != NULL);
-
-    new_node->parent = node->parent;
-
-    if (node->parent->left == node)
-    {
-        node->parent->left = new_node;
-    }
-    else
-    {
-        node->parent->right = new_node;
+        return MathConvoluteLeftToCurrent(node, math_ctx);
     }
 
     return MATH_SUCCESS;
@@ -189,28 +263,55 @@ static MathErr_t MathProcessNeutralsMulCase(TreeNode_t* node, MathCtx_t* math_ct
     assert(node     != NULL);
     assert(math_ctx != NULL);
 
-    MathErr_t error = MATH_SUCCESS;
+    if (ISVALUE_(left, 0.0) || ISVALUE_(right, 0.0))
+        return MathConvoluteNodeToNumber(node, math_ctx, 0.0);
+
+    if (ISVALUE_(left, 1.0))
+        return MathConvoluteRightToCurrent(node, math_ctx);
+
+    if (ISVALUE_(right, 1.0))
+        return MathConvoluteLeftToCurrent(node, math_ctx);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t MathProcessNeutralsDivCase(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    assert(node     != NULL);
+    assert(math_ctx != NULL);
+
+    if (ISVALUE_(right, 0.0))
+    {
+        PRINTERR("ERROR: division by zero");
+        return MATH_INVALID_OP;
+    }
 
     if (ISVALUE_(left, 0.0))
-    {
-        DPRINTF("\tMUL: Handling \"left value is zero\" case\n");
+        return MathConvoluteNodeToNumber(node, math_ctx, 0.0);
 
-        if ((error = MathNeutralsConvoluteBranch(node, node->left)))
-            return error;
+    if (ISVALUE_(right, 1.0))
+        return MathConvoluteLeftToCurrent(node, math_ctx);
 
-        TreeNodeDtor(node->right, &math_ctx->tree);
-        TreeSingleNodeDtor(node, &math_ctx->tree);
-    }
-    else if (ISVALUE_(right, 0.0))
-    {
-        DPRINTF("\tMUL: Handling \"right value is zero\" case\n");
+    return MATH_SUCCESS;
+}
 
-        if ((error = MathNeutralsConvoluteBranch(node, node->right)))
-            return error;
+//------------------------------------------------------------------------------------------
 
-        TreeNodeDtor(node->left, &math_ctx->tree);
-        TreeSingleNodeDtor(node, &math_ctx->tree);
-    }
+static MathErr_t MathProcessNeutralsDegCase(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    assert(node     != NULL);
+    assert(math_ctx != NULL);
+
+    if (ISVALUE_(left, 0.0))
+        return MathConvoluteNodeToNumber(node, math_ctx, 0.0);
+
+    if (ISVALUE_(left, 1.0) || ISVALUE_(right, 0.0))
+        return MathConvoluteNodeToNumber(node, math_ctx, 1.0);
+
+    if (ISVALUE_(right, 1.0))
+        return MathConvoluteLeftToCurrent(node, math_ctx);
 
     return MATH_SUCCESS;
 }
@@ -307,10 +408,6 @@ static int MathNodeIsNum(TreeNode_t* node)
 {
     return node->data.type == TYPE_NUM;
 }
-
-//------------------------------------------------------------------------------------------
-
-
 
 /* ====================================================================================== */
 

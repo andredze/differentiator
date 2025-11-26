@@ -10,6 +10,7 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+MathErr_t MathSimplify          (MathCtx_t* math_ctx);
 MathErr_t MathDeleteNeutral     (MathCtx_t* math_ctx);
 MathErr_t MathConvoluteConsts   (MathCtx_t* math_ctx);
 

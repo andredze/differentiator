@@ -1,5 +1,7 @@
 #include "math_diff.h"
 
+//FIXME - родительские узлы в дифф. дереве указывают на дерево обычной функции
+
 /* ==================== Domain Specific Language for differentiation ==================== */
 
 // lnode means left_node
@@ -7,12 +9,12 @@
 
 /* if operation has 1 argument, it should be placed in right node */
 
-#define dL    MathDiffNode(math_ctx, node->left,  diff_var_ind, parent )
-#define dR    MathDiffNode(math_ctx, node->right, diff_var_ind, parent )
+#define dL    MathDiffNode(math_ctx, node->left,  diff_var_ind, node)
+#define dR    MathDiffNode(math_ctx, node->right, diff_var_ind, node)
 
-#define cL    TreeCopySubtree(&math_ctx->tree, node->left , parent )
-#define cR    TreeCopySubtree(&math_ctx->tree, node->right, parent )
-#define cN    TreeCopySubtree(&math_ctx->tree, node       , parent )
+#define cL    TreeCopySubtree(&math_ctx->tree, node->left , node)
+#define cR    TreeCopySubtree(&math_ctx->tree, node->right, node)
+#define cN    TreeCopySubtree(&math_ctx->tree, node       , parent) // NOTE: проверить parent
 
 #define numL  node->left->data.value.num
 #define numR  node->right->data.value.num
