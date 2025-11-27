@@ -14,23 +14,21 @@ int main()
     MathCtx_t diff_math_ctx = {};
 
     TreeOpenLogFile();
+    MathOpenTexFile();
 
     do {
-        if (MathOpenTexFile())
-            break;
-
         if (MathCtxCtor(&math_ctx, 0))
             break;
 
-        const char* buffer = "3+5$";
-        const char* cur_p  = buffer;
-
-        Expr_t expr = { .buffer = buffer, .cur_p = cur_p };
-
-        if (MathParseText(&math_ctx, &expr))
-            break;
-
-        break;
+//         const char* buffer = "3+5$";
+//         const char* cur_p  = buffer;
+//
+//         Expr_t expr = { .buffer = buffer, .cur_p = cur_p };
+//
+//         if (MathParseText(&math_ctx, &expr))
+//             break;
+//
+//         break;
 
         if (TreeReadInputData(&math_ctx))
             break;

@@ -13,7 +13,10 @@ MathErr_t MathCtxCtor(MathCtx_t* math_ctx, size_t vars_capacity)
     math_ctx->vars.data = (VarCase_t*) calloc(VARS_MIN_COUNT, sizeof(VarCase_t));
 
     if (math_ctx->vars.data == NULL)
+    {
+        PRINTERR("Memory allocation failed");
         return MATH_ALLOC_ERROR;
+    }
 
     math_ctx->vars.size = 0;
     math_ctx->vars.capacity = vars_capacity;
@@ -79,6 +82,11 @@ MathErr_t MathCtxDtor(MathCtx_t* math_ctx)
 TreeNode_t* MathNodeCtor(MathCtx_t* math_ctx, MathData_t data, TreeNode_t* left, TreeNode_t* right)
 {
     assert(math_ctx != NULL);
+
+    if (node->data.type == TYPE_VAR)
+    {
+        MathAddVarTable(node->data.);
+    }
 
     TreeNode_t* node = TreeNodeCtor(&math_ctx->tree, data, left, right, NULL);
 

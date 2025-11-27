@@ -44,6 +44,8 @@ MathErr_t MathSimplify(MathCtx_t* math_ctx)
             return error;
         if ((error = MathConvoluteConsts(math_ctx)))
             return error;
+
+        DPRINTF("current size = %zu; size_before = %zu;\n", math_ctx->tree.size, size_before);
     }
 
     return MATH_SUCCESS;

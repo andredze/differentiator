@@ -1,11 +1,5 @@
 #include "text_parse.h"
 
-//——————————————————————————————————————————————————————————————————————————————————————————
-
-// const char* str         = "5+8*(10+30=-98$";
-const char* str       = "5+8$";
-const char* str_start = str;
-
 /* ==================== Domain Specific Language for reading data ========================== */
 
 // lnode means left_node
@@ -34,14 +28,36 @@ const char* str_start = str;
 
 /* ====================================================================================== */
 
+#ifdef TREE_DEBUG
+    #define TREE_READ_BUFFER_DUMP(expr, fmt, ...)                                                      \
+            BEGIN                                                                                      \
+            TreeReadBufferDump((expr->buffer), (expr->cur_p - expr->buffer), (fmt), ##__VA_ARGS__);    \
+            END
+    #define MATH_VARS_DUMP(math_ctx, fmt, ...)                      \
+            BEGIN                                                   \
+            MathVarsTableDump((math_ctx), (fmt), ##__VA_ARGS__);    \
+            END
+#else
+    #define TREE_READ_BUFFER_DUMP(expr, fmt, ...) ;
+    #define MATH_VARS_DUMP(math_ctx, fmt, ...)    ;
+#endif
+
+//------------------------------------------------------------------------------------------
+
 static void PrintSyntaxError(Expr_t* expr,   const char* file, const char* func,
                              const int line, const char* fmt, ...);
+
+static void SkipSpaces(Expr_t* expr);
 
 static TreeNode_t* GetG (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetE (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetT (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetP (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetPBracketsCase(MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetN (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetV (MathCtx_t* math_ctx, Expr_t* expr);
+
+static MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -79,6 +95,20 @@ MathErr_t MathParseText(MathCtx_t* math_ctx, Expr_t* expr)
 
 //------------------------------------------------------------------------------------------
 
+static void SkipSpaces(Expr_t* expr)
+{
+    assert(expr != NULL);
+
+    char ch = '\0';
+
+    while ((ch = *expr->cur_p) != '\0' && isspace(ch))
+    {
+        expr->cur_p++;
+    }
+}
+
+//------------------------------------------------------------------------------------------
+
 static void PrintSyntaxError(Expr_t* expr, const char* file, const char* func, const int line, const char* fmt, ...)
 {
     char message[MAX_SYNTAX_ERR_MESSAGE_LEN] = {};
@@ -110,6 +140,8 @@ static TreeNode_t* GetG(MathCtx_t* math_ctx, Expr_t* expr)
     if (node == NULL)
         return NULL;
 
+    SkipSpaces(expr);
+
     if (*expr->cur_p != END_SYMBOL)
         SYNTAX_ERROR(math_ctx, expr, "Unknown symbol at end");
 
@@ -127,10 +159,14 @@ static TreeNode_t* GetE(MathCtx_t* math_ctx, Expr_t* expr)
     if (node1 == NULL)
         return NULL;
 
+    SkipSpaces(expr);
+
     while (*expr->cur_p == '+' || *expr->cur_p == '-')
     {
         int operation = *expr->cur_p;
         expr->cur_p++;
+
+        TREE_READ_BUFFER_DUMP(expr, "GET E: READ \"+ | -\"");
 
         TreeNode_t* node2 = GetT(math_ctx, expr);
 
@@ -155,10 +191,13 @@ static TreeNode_t* GetT(MathCtx_t* math_ctx, Expr_t* expr)
     if (node1 == NULL)
         return NULL;
 
+    SkipSpaces(expr);
+
     while (*expr->cur_p == '*' || *expr->cur_p == '/')
     {
         int operation = *expr->cur_p;
         expr->cur_p++;
+        TREE_READ_BUFFER_DUMP(expr, "GET T: READ \"* | /\"");
 
         TreeNode_t* node2 = GetP(math_ctx, expr);
 
@@ -185,27 +224,37 @@ static TreeNode_t* GetP(MathCtx_t* math_ctx, Expr_t* expr)
 {
     TreeNode_t* node = 0;
 
+    SkipSpaces(expr);
+
     if (*expr->cur_p == '(')
-    {
-        expr->cur_p++;
-
-        node = GetE(math_ctx, expr);
-
-        if (node == NULL)
-            return NULL;
-
-        if (*expr->cur_p != ')')
-            SYNTAX_ERROR(math_ctx, expr, "no matching bracket");
-
-        expr->cur_p++;
-    }
-    else
-    {
+        node = GetPBracketsCase(math_ctx, expr);
+    else if (isdigit(*expr->cur_p))
         node = GetN(math_ctx, expr);
+    else
+        node = GetV(math_ctx, expr);
 
-        if (node == NULL)
-            return NULL;
-    }
+    return node;
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* GetPBracketsCase(MathCtx_t* math_ctx, Expr_t* expr)
+{
+    expr->cur_p++;
+    TREE_READ_BUFFER_DUMP(expr, "GET P: READ \"(\"");
+
+    TreeNode_t* node = GetE(math_ctx, expr);
+
+    if (node == NULL)
+        return NULL;
+
+    SkipSpaces(expr);
+
+    if (*expr->cur_p != ')')
+        SYNTAX_ERROR(math_ctx, expr, "no matching bracket");
+
+    expr->cur_p++;
+    TREE_READ_BUFFER_DUMP(expr, "GET P: READ \")\"");
 
     return node;
 }
@@ -214,6 +263,8 @@ static TreeNode_t* GetP(MathCtx_t* math_ctx, Expr_t* expr)
 
 static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
 {
+    SkipSpaces(expr);
+
     const char* start = expr->cur_p;
     double      value = 0;
 
@@ -224,11 +275,84 @@ static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
     }
 
     if (start == expr->cur_p)
-        SYNTAX_ERROR(math_ctx, expr, "Unknown symbol is not a number");
+        SYNTAX_ERROR(math_ctx, expr, "Unknown symbol: not a number");
 
     TreeNode_t* node = NUM_(value);
 
+    TREE_READ_BUFFER_DUMP(expr, "GET N: READ number \"%lg\"", value);
+
     return node;
+}
+
+//------------------------------------------------------------------------------------------
+
+// TODO - переделать однобуквенные переменные на многобуквенные
+
+static TreeNode_t* GetV(MathCtx_t* math_ctx, Expr_t* expr)
+{
+    SkipSpaces(expr);
+
+    if (!isalpha(*expr->cur_p))
+        SYNTAX_ERROR(math_ctx, expr, "not a letter at start of variable");
+
+    TreeNode_t* node = MathNodeCtor(math_ctx, {.type = TYPE_VAR}, NULL, NULL);
+
+    if (node == NULL)
+        return NULL;
+
+    if (PutVarInTable(math_ctx, expr->cur_p, 1, &node->data))
+        return NULL;
+
+    expr->cur_p++;
+
+    TREE_READ_BUFFER_DUMP(expr, "GET V: READ variable \"vars[%d] = %s\"",
+                                node->data.value.var,
+                                math_ctx->vars.data[node->data.value.var].str);
+
+    return node;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data)
+{
+    assert(math_ctx != NULL);
+    assert(data     != NULL);
+    assert(str      != NULL);
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if (math_ctx->vars.size >= math_ctx->vars.capacity)
+    {
+        if ((error = MathVarsTableRealloc(math_ctx)))
+            return error;
+    }
+
+    for (size_t i = 0; i < math_ctx->vars.size; i++)
+    {
+        if (strncmp(math_ctx->vars.data[i].str, str, str_len) == 0)
+            return MATH_SUCCESS;
+    }
+
+    char* var_str = strndup(str, str_len);
+
+    if (var_str == NULL)
+    {
+        PRINTERR("Memory allocation failed");
+        return MATH_ALLOC_ERROR;
+    }
+
+    math_ctx->vars.data[math_ctx->vars.size].str = var_str;
+
+    data->value.var = math_ctx->vars.size;
+
+    math_ctx->vars.size++;
+
+    MATH_VARS_DUMP(math_ctx, "DUMP AFTER PUTTING VARIABLE %s (index = %zu)",
+                   var_str,
+                   math_ctx->vars.size - 1);
+
+    return MATH_SUCCESS;
 }
 
 //==========================================================================================

@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "common.h"
 #include "math_types.h"
 #include "math_funcs.h"
@@ -16,15 +17,14 @@
 
 typedef struct Expr
 {
-    const char* buffer;
-    const char* cur_p;
+    char* buffer;
+    char* cur_p;
 } Expr_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 const char END_SYMBOL                 = '$';
 const int  MAX_SYNTAX_ERR_MESSAGE_LEN = 128;
-const int  CALC_POISON                = 777666777;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

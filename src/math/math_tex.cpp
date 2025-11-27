@@ -15,6 +15,7 @@ static void MathTexDumpBracketIfNeeded  (TreeNode_t* node, char bracket);
 static void MathTexDumpBraceIfNeeded    (TreeNode_t* node, char bracket);
 static void MathTexDumpNumber           (double num);
 static int  MathNodeMatchesOp           (TreeNode_t* node, MathOp_t op);
+static void MathTexVariables            (MathCtx_t* math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -35,6 +36,8 @@ void MathTexMessage(const char* fmt, ...)
     va_end(args);
 
     fprintf(fp, "%s\n", buffer);
+
+    fflush(fp);
 }
 
 //------------------------------------------------------------------------------------------
@@ -52,6 +55,8 @@ void MathTexSection(const char* fmt, ...)
     va_end(args);
 
     fprintf(fp, "\\section{%s}\n", buffer);
+
+    fflush(fp);
 }
 
 //------------------------------------------------------------------------------------------
@@ -103,6 +108,8 @@ void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
     MathTexDumpNode(node, math_ctx);
 
     fprintf(fp, "\\]\n");
+
+    fflush(fp);
 }
 
 //------------------------------------------------------------------------------------------
@@ -129,15 +136,9 @@ void MathTexEval(MathCtx_t* math_ctx, double result)
 {
     fprintf(fp, "\\[f(");
 
-    for (size_t i = 0; i < math_ctx->vars.size - 1; i++)
-    {
-        fprintf(fp, "%s = %lg, ", math_ctx->vars.data[i].str, math_ctx->vars.data[i].value);
-    }
+    MathTexVariables(math_ctx);
 
-    fprintf(fp, "%s = %lg) = ", math_ctx->vars.data[math_ctx->vars.size - 1].str,
-                                math_ctx->vars.data[math_ctx->vars.size - 1].value);
-
-    //NOTE - в структуру контекста положить флаг dump_values и если он 1 то писать не %s, str а %lg, value
+    fprintf(fp, ") = ");
 
     math_ctx->dump_values = 1;
 
@@ -146,6 +147,26 @@ void MathTexEval(MathCtx_t* math_ctx, double result)
     math_ctx->dump_values = 0;
 
     fprintf(fp, " = %lg\\]\n", result);
+
+    fflush(fp);
+}
+
+//------------------------------------------------------------------------------------------
+
+static void MathTexVariables(MathCtx_t* math_ctx)
+{
+    if (math_ctx->vars.size > 0)
+    {
+        for (size_t i = 0; i < math_ctx->vars.size - 1; i++)
+        {
+            fprintf(fp, "%s = %lg, ", math_ctx->vars.data[i].str, math_ctx->vars.data[i].value);
+        }
+
+        fprintf(fp, "%s = %lg", math_ctx->vars.data[math_ctx->vars.size - 1].str,
+                                math_ctx->vars.data[math_ctx->vars.size - 1].value);
+    }
+
+    fflush(fp);
 }
 
 //------------------------------------------------------------------------------------------
@@ -196,7 +217,7 @@ R"(\documentclass[12pt, a4paper]{article}
 
 \maketitle
 )");
-
+    fflush(fp);
 }
 
 //------------------------------------------------------------------------------------------
@@ -204,6 +225,7 @@ R"(\documentclass[12pt, a4paper]{article}
 static void TexDumpEnding()
 {
     fprintf(fp, "\\end{document}");
+    fflush(fp);
 }
 
 //------------------------------------------------------------------------------------------
@@ -341,7 +363,11 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
 
         case TYPE_VAR:
             if (math_ctx->dump_values == 0)
+            {
+                // DPRINTF("data.value.var = %d;\n", data.value.var);
+                // if (math_ctx->vars.data[data.value.var].str != NULL)
                 fprintf(fp, "%s", math_ctx->vars.data[data.value.var].str);
+            }
             else
                 fprintf(fp, "%lg", math_ctx->vars.data[data.value.var].value);
             break;

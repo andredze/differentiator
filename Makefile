@@ -29,7 +29,7 @@ SOURCES = src/main.cpp 						\
 		  src/math/math_diff.cpp			\
 		  src/math/math_tex.cpp				\
 		  src/math/math_simplify.cpp		\
-		  src/text_parse.cpp
+		  src/data_access/text_parse.cpp
 
 ifdef DEBUG
 CXXFLAGS += -D TREE_DEBUG
