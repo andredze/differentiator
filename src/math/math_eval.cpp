@@ -16,6 +16,9 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
     assert(math_ctx != NULL);
     assert(presult  != NULL);
 
+    MathTexSection("Вычисление значений");
+    MathTexMessage("Заметим, что");
+
     double result = 0.0;
 
     MathErr_t error = MATH_SUCCESS;
@@ -27,6 +30,8 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
         return error;
 
     *presult = result;
+
+    MathTexEval(math_ctx, *presult);
 
     return MATH_SUCCESS;
 }
@@ -156,7 +161,8 @@ static MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node,
             return error;
     }
 
-    MathCtxTexDump(math_ctx, "evaluated binary op at %p", node);
+    // TODO: tex dump с подстановкой значений
+    // MathCtxTexDump(math_ctx, "evaluated binary op at %p", node);
 
     return MathExecuteBinaryOperation(node->data.value.op, left_result, right_result, result);
 }

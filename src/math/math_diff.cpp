@@ -40,8 +40,6 @@
 
 /* ====================================================================================== */
 
-static TreeNode_t* MathNodeCtor      (MathCtx_t* math_ctx, MathData_t data, TreeNode_t* left, TreeNode_t* right);
-static TreeNode_t* MathCopySubtree   (MathCtx_t* math_ctx, TreeNode_t* node);
 static TreeNode_t* MathDiffNumber    (MathCtx_t* math_ctx);
 static TreeNode_t* MathDiffVariable  (MathCtx_t* math_ctx, size_t curr_var_ind, size_t diff_var_ind);
 static TreeNode_t* MathDiffNode      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
@@ -112,6 +110,8 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
     assert(src_math_ctx  != NULL);
 
     DEBUG_TREE_CHECK(src_math_ctx, "MATH_DIFF");
+    MathTexSection("Дифференцирование");
+    MathTexMessage("Очевидно, что");
 
     char* copy_str_var = strdup(str_var);
 
@@ -213,67 +213,6 @@ static TreeNode_t* MathDiffOperation(MathCtx_t* math_ctx, TreeNode_t* node, size
     assert(node     != NULL);
 
     return MATH_DIFF_OPER_TABLE[node->data.value.op](math_ctx, node, diff_var_ind);
-}
-
-//------------------------------------------------------------------------------------------
-
-static TreeNode_t* MathNodeCtor(MathCtx_t* math_ctx, MathData_t data, TreeNode_t* left, TreeNode_t* right)
-{
-    assert(math_ctx != NULL);
-
-    TreeNode_t* node = TreeNodeCtor(&math_ctx->tree, data, left, right, NULL);
-
-    if (node == NULL)
-    {
-        TreeNodeDtor(left, &math_ctx->tree);
-        TreeNodeDtor(right, &math_ctx->tree);
-    }
-    else
-    {
-        if (node->left != NULL)
-            node->left->parent  = node;
-        if (node->right != NULL)
-            node->right->parent = node;
-    }
-
-    return node;
-}
-
-//------------------------------------------------------------------------------------------
-
-static TreeNode_t* MathCopySubtree(MathCtx_t* math_ctx, TreeNode_t* node)
-{
-    assert(math_ctx != NULL);
-
-    if (node == NULL)
-        return NULL;
-
-    TreeNode_t* left  = MathCopySubtree(math_ctx, node->left);
-    TreeNode_t* right = MathCopySubtree(math_ctx, node->right);
-
-    if (right == NULL && left != NULL)
-    {
-        TreeNodeDtor(left, &math_ctx->tree);
-        return NULL;
-    }
-
-    TreeNode_t* new_node  = MathNodeCtor(math_ctx, node->data, left, right);
-
-    if (new_node == NULL)
-    {
-        TreeNodeDtor(left, &math_ctx->tree);
-        TreeNodeDtor(right, &math_ctx->tree);
-        return NULL;
-    }
-    else
-    {
-        if (new_node->left != NULL)
-            new_node->left->parent = new_node;
-        if (new_node->right != NULL)
-            new_node->right->parent = new_node;
-    }
-
-    return new_node;
 }
 
 //------------------------------------------------------------------------------------------

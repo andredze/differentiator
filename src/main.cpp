@@ -1,5 +1,6 @@
 #include "tree_commands.h"
 #include "data_read.h"
+#include "text_parse.h"
 #include "math_funcs.h"
 #include "math_eval.h"
 #include "math_diff.h"
@@ -21,16 +22,28 @@ int main()
         if (MathCtxCtor(&math_ctx, 0))
             break;
 
+        const char* buffer = "3+5$";
+        const char* cur_p  = buffer;
+
+        Expr_t expr = { .buffer = buffer, .cur_p = cur_p };
+
+        if (MathParseText(&math_ctx, &expr))
+            break;
+
+        break;
+
         if (TreeReadInputData(&math_ctx))
             break;
 
         if (MathSimplify(&math_ctx))
             break;
 
-        if (MathCtxCtor(&diff_math_ctx, 0))
+        double result = 0;
+
+        if (MathEvaluate(&math_ctx, &result))
             break;
 
-        if (MathCtxTexDump(&math_ctx, "Main dump"))
+        if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
         if (MathDifferentiate(&math_ctx, &diff_math_ctx, "x"))
@@ -41,14 +54,6 @@ int main()
 
         if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))
             break;
-
-//         double result = 0.0;
-//
-//         if (MathEvaluate(&math_ctx, &result))
-//             break;
-//
-//         printf("result = %lg\n", result);
-
     } while (0);
 
     MathCloseTexFile();

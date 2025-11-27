@@ -27,6 +27,11 @@ static MathErr_t MathConvoluteSingleNode        (TreeNode_t* node, MathCtx_t* ma
 
 MathErr_t MathSimplify(MathCtx_t* math_ctx)
 {
+    MathTexSection("Упрощение выражения");
+    MathTexMessage("Путем несложных преобразований");
+
+    MathCtxTexDump(math_ctx, NULL);
+
     size_t size_before = 0;
 
     MathErr_t error = MATH_SUCCESS;
@@ -103,6 +108,8 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
         return MATH_UNKNOWN_OP;
     }
 
+    size_t size_before = math_ctx->tree.size;
+
     switch (node->data.value.op)
     {
         case OP_ADD:
@@ -135,7 +142,8 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
             return MATH_UNKNOWN_OP;
     }
 
-    MathCtxTexDump(math_ctx, "Deleted neutrals at node %p", node);
+    if (size_before != math_ctx->tree.size)
+        MathCtxTexDump(math_ctx, NULL, node);
 
     return MATH_SUCCESS;
 }
@@ -395,7 +403,7 @@ static MathErr_t MathConvoluteSingleNode(TreeNode_t* node, MathCtx_t* math_ctx)
     node->data.type      = TYPE_NUM;
     node->data.value.num = result;
 
-    MathCtxTexDump(math_ctx, "Simplified node %p", node);
+    MathCtxTexDump(math_ctx, NULL, node);
 
     // TODO: MathTexDumpSimplify(node, math_ctx);
 

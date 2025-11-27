@@ -1,31 +1,35 @@
-#ifndef MATH_TEX_H
-#define MATH_TEX_H
+#ifndef TEXT_PARSE_H
+#define TEXT_PARSE_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "common.h"
 #include "math_types.h"
+#include "math_funcs.h"
+#include "math_tex.h"
 #include "tree_types.h"
 #include "tree_commands.h"
-#include "math_funcs.h"
-#include <stdarg.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathOpenTexFile   ();
-MathErr_t MathCloseTexFile  ();
-void      MathTexSection    (const char* fmt, ...);
-void      MathTexMessage    (const char* fmt, ...);
-void      MathTexEval       (MathCtx_t* math_ctx, double result);
-MathErr_t MathCtxTexDump    (MathCtx_t* math_ctx, const char* fmt, ...);
-MathErr_t vMathCtxTexDump   (MathCtx_t* math_ctx, const char* fmt, va_list args);
-void      MathTexDumpSubtree    (TreeNode_t* node, MathCtx_t* math_ctx);
-void      MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx);
+typedef struct Expr
+{
+    const char* buffer;
+    const char* cur_p;
+} Expr_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-const char TEX_FILE_NAME[] = "math_log.tex";
-const int  MAX_MESSAGE_LEN = 200;
+const char END_SYMBOL                 = '$';
+const int  MAX_SYNTAX_ERR_MESSAGE_LEN = 128;
+const int  CALC_POISON                = 777666777;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#endif /* MATH_TEX_H */
+MathErr_t MathParseText(MathCtx_t* math_ctx, Expr_t* expr);
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+#endif /* TEXT_PARSE_H */

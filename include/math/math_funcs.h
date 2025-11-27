@@ -9,9 +9,11 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathCtxCtor           (MathCtx_t* math_ctx, size_t vars_capacity);
-MathErr_t MathVarsTableRealloc  (MathCtx_t* math_ctx);
-MathErr_t MathCtxDtor           (MathCtx_t* math_ctx);
+MathErr_t   MathCtxCtor           (MathCtx_t* math_ctx, size_t vars_capacity);
+MathErr_t   MathVarsTableRealloc  (MathCtx_t* math_ctx);
+MathErr_t   MathCtxDtor           (MathCtx_t* math_ctx);
+TreeNode_t* MathNodeCtor          (MathCtx_t* math_ctx, MathData_t data, TreeNode_t* left, TreeNode_t* right);
+TreeNode_t* MathCopySubtree       (MathCtx_t* math_ctx, TreeNode_t* node);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

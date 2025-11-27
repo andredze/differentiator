@@ -22,10 +22,43 @@ static FILE* fp = NULL;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+void MathTexMessage(const char* fmt, ...)
+{
+    va_list args = {};
+
+    va_start(args, fmt);
+
+    char buffer[MAX_MESSAGE_LEN] = {};
+
+    vsprintf(buffer, fmt, args);
+
+    va_end(args);
+
+    fprintf(fp, "%s\n", buffer);
+}
+
+//------------------------------------------------------------------------------------------
+
+void MathTexSection(const char* fmt, ...)
+{
+    va_list args = {};
+
+    va_start(args, fmt);
+
+    char buffer[MAX_MESSAGE_LEN] = {};
+
+    vsprintf(buffer, fmt, args);
+
+    va_end(args);
+
+    fprintf(fp, "\\section{%s}\n", buffer);
+}
+
+//------------------------------------------------------------------------------------------
+
 MathErr_t MathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, ...)
 {
     assert(math_ctx != NULL);
-    assert(fmt      != NULL);
 
     va_list args = {};
     va_start(args, fmt);
@@ -42,7 +75,6 @@ MathErr_t MathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, ...)
 MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
 {
     assert(math_ctx != NULL);
-    assert(fmt      != NULL);
 
     DPRINTF("   > Start of TEX dump\n");
 
@@ -52,7 +84,8 @@ MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
         return MATH_SUCCESS;
     }
 
-    vfprintf(fp, fmt, args);
+    if (fmt != NULL)
+        vfprintf(fp, fmt, args);
 
     MathTexDumpSubtree(math_ctx->tree.dummy->right, math_ctx);
 
@@ -65,7 +98,7 @@ MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
 
 void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, "\n\\[");
+    fprintf(fp, "\\[");
 
     MathTexDumpNode(node, math_ctx);
 
@@ -76,7 +109,7 @@ void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
 
 void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, "\n\\[");
+    fprintf(fp, "\\[");
     fprintf(fp, R"(\frac{d}{d%s})""(", math_ctx->vars.data[0].str);
 
     // TODO: как не терять переменные??? нужно хранить еще и src_mathctx????
@@ -88,6 +121,31 @@ void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* 
     MathTexDumpNode(diff_node, math_ctx);
 
     fprintf(fp, "\\]\n");
+}
+
+//------------------------------------------------------------------------------------------
+
+void MathTexEval(MathCtx_t* math_ctx, double result)
+{
+    fprintf(fp, "\\[f(");
+
+    for (size_t i = 0; i < math_ctx->vars.size - 1; i++)
+    {
+        fprintf(fp, "%s = %lg, ", math_ctx->vars.data[i].str, math_ctx->vars.data[i].value);
+    }
+
+    fprintf(fp, "%s = %lg) = ", math_ctx->vars.data[math_ctx->vars.size - 1].str,
+                                math_ctx->vars.data[math_ctx->vars.size - 1].value);
+
+    //NOTE - в структуру контекста положить флаг dump_values и если он 1 то писать не %s, str а %lg, value
+
+    math_ctx->dump_values = 1;
+
+    MathTexDumpNode(math_ctx->tree.dummy->right, math_ctx);
+
+    math_ctx->dump_values = 0;
+
+    fprintf(fp, " = %lg\\]\n", result);
 }
 
 //------------------------------------------------------------------------------------------
@@ -137,8 +195,7 @@ R"(\documentclass[12pt, a4paper]{article}
 \begin{document}
 
 \maketitle
-
-\section{Исходное выражение})");
+)");
 
 }
 
@@ -237,7 +294,13 @@ static void MathTexDumpNodeInorder(TreeNode_t* node, MathCtx_t* math_ctx)
 
 static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket)
 {
-    // TODO: if (node->parent->data.value.op == OP_MUL || OP_DIV)
+    if (node->parent == NULL)
+        return;
+
+    if (node->parent->data.value.op != OP_MUL &&
+        node->parent->data.value.op != OP_DIV)
+        return;
+
     if (node->data.type != TYPE_OP)
         return;
 
@@ -273,11 +336,14 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
             break;
 
         case TYPE_OP:
-            fprintf(fp, "%s ", OP_CASES_TABLE[data.value.op].str);
+            fprintf(fp, "%s", OP_CASES_TABLE[data.value.op].str);
             break;
 
         case TYPE_VAR:
-            fprintf(fp, "%s ", math_ctx->vars.data[data.value.var].str);
+            if (math_ctx->dump_values == 0)
+                fprintf(fp, "%s", math_ctx->vars.data[data.value.var].str);
+            else
+                fprintf(fp, "%lg", math_ctx->vars.data[data.value.var].value);
             break;
 
         default:

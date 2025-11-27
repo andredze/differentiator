@@ -28,6 +28,7 @@ typedef struct MathContext
 {
     Tree_t tree;
     Vars_t vars;
+    int dump_values;
 } MathCtx_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
