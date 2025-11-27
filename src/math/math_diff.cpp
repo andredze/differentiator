@@ -1,7 +1,5 @@
 #include "math_diff.h"
 
-//FIXME - родительские узлы в дифф. дереве указывают на дерево обычной функции
-
 /* ==================== Domain Specific Language for differentiation ==================== */
 
 // lnode means left_node
@@ -9,12 +7,12 @@
 
 /* if operation has 1 argument, it should be placed in right node */
 
-#define dL    MathDiffNode(math_ctx, node->left,  diff_var_ind)
-#define dR    MathDiffNode(math_ctx, node->right, diff_var_ind)
+#define dL    MathDiffNode(math_ctx, node->left,  diff_var_ind, src_math_ctx)
+#define dR    MathDiffNode(math_ctx, node->right, diff_var_ind, src_math_ctx)
 
-#define cL    MathCopySubtree(math_ctx, node->left )
-#define cR    MathCopySubtree(math_ctx, node->right)
-#define cN    MathCopySubtree(math_ctx, node       )
+#define cL    MathCopySubtree(math_ctx, node->left , src_math_ctx)
+#define cR    MathCopySubtree(math_ctx, node->right, src_math_ctx)
+#define cN    MathCopySubtree(math_ctx, node       , src_math_ctx)
 
 #define numL  node->left->data.value.num
 #define numR  node->right->data.value.num
@@ -41,10 +39,17 @@
 /* ====================================================================================== */
 
 static TreeNode_t* MathDiffNumber    (MathCtx_t* math_ctx);
+
 static TreeNode_t* MathDiffVariable  (MathCtx_t* math_ctx, size_t curr_var_ind, size_t diff_var_ind);
-static TreeNode_t* MathDiffNode      (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
-static TreeNode_t* MathDiffOperation (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
-static TreeNode_t* MathDiffDeg       (MathCtx_t* math_ctx, TreeNode_t* node,    size_t diff_var_ind);
+
+static TreeNode_t* MathDiffNode      (MathCtx_t* math_ctx, TreeNode_t* node,
+                                      size_t diff_var_ind, MathCtx_t* src_math_ctx);
+
+static TreeNode_t* MathDiffOperation (MathCtx_t* math_ctx, TreeNode_t* node,
+                                      size_t diff_var_ind, MathCtx_t* src_math_ctx);
+
+static TreeNode_t* MathDiffDeg       (MathCtx_t* math_ctx, TreeNode_t* node,
+                                      size_t diff_var_ind, MathCtx_t* src_math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -52,7 +57,8 @@ static TreeNode_t* MathDiffDeg       (MathCtx_t* math_ctx, TreeNode_t* node,    
 static TreeNode_t*                                  \
 MathDiff##op_name ( MathCtx_t*   math_ctx,          \
                     TreeNode_t*  node,              \
-                    size_t       diff_var_ind )     \
+                    size_t       diff_var_ind,      \
+                    MathCtx_t*   src_math_ctx )     \
 {                                                   \
     assert(math_ctx != NULL);                       \
     assert(node     != NULL);                       \
@@ -86,7 +92,7 @@ DECLARE_MATH_DIFF_OPER(Ln,  ( MUL_(DIV_(NUM_(1), cR), dR) ));
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-TreeNode_t* (* const MATH_DIFF_OPER_TABLE[]) (MathCtx_t*, TreeNode_t*, size_t) =
+TreeNode_t* (* const MATH_DIFF_OPER_TABLE[]) (MathCtx_t*, TreeNode_t*, size_t, MathCtx_t*) =
 {
     [OP_ADD] = MathDiffAdd,
     [OP_SUB] = MathDiffSub,
@@ -102,8 +108,6 @@ TreeNode_t* (* const MATH_DIFF_OPER_TABLE[]) (MathCtx_t*, TreeNode_t*, size_t) =
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-// TODO: почистить эту ф-ю
-
 MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var)
 {
     assert(dest_math_ctx != NULL);
@@ -113,27 +117,21 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
     MathTexSection("Дифференцирование");
     MathTexMessage("Очевидно, что");
 
-    char* copy_str_var = strdup(str_var);
-
-    if (copy_str_var == NULL)
+    if (!MathVarInTable(src_math_ctx, str_var))
     {
-        PRINTERR("Memory allocation failed");
-        return MATH_ALLOC_ERROR;
+        cprintf(RED, "given variable for diff is not in original function\n");
+        return MATH_SUCCESS;
     }
 
-    VarCase_t var_case  = { .str = copy_str_var };
-    size_t    var_index = 0;
+    MathErr_t error = MATH_SUCCESS;
 
-    for (size_t i = 0; i < src_math_ctx->vars.size; i++)
-    {
-        if (strcmp(copy_str_var, src_math_ctx->vars.data[i].str) == 0)
-            var_index = i;
-    }
+    if ((error = MathAddVarToTable(dest_math_ctx, str_var)))
+        return error;
 
-    dest_math_ctx->vars.data[0] = var_case;
-    dest_math_ctx->vars.size = 1;
+    size_t var_index = 0;
 
-    TreeNode_t* root = MathDiffNode(dest_math_ctx, src_math_ctx->tree.dummy->right, var_index);
+    TreeNode_t* root = MathDiffNode(dest_math_ctx, src_math_ctx->tree.dummy->right,
+                                    var_index, src_math_ctx);
 
     if (root == NULL)
     {
@@ -151,7 +149,8 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
 
 //------------------------------------------------------------------------------------------
 
-static TreeNode_t* MathDiffNode(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+static TreeNode_t* MathDiffNode(MathCtx_t* math_ctx, TreeNode_t* node,
+                                size_t diff_var_ind, MathCtx_t* src_math_ctx)
 {
     assert(math_ctx != NULL);
     assert(node     != NULL);
@@ -169,7 +168,7 @@ static TreeNode_t* MathDiffNode(MathCtx_t* math_ctx, TreeNode_t* node, size_t di
             break;
 
         case TYPE_OP:
-            new_node = MathDiffOperation(math_ctx, node, diff_var_ind);
+            new_node = MathDiffOperation(math_ctx, node, diff_var_ind, src_math_ctx);
             break;
 
         default:
@@ -207,17 +206,28 @@ static TreeNode_t* MathDiffVariable(MathCtx_t* math_ctx, size_t curr_var_ind, si
 
 //------------------------------------------------------------------------------------------
 
-static TreeNode_t* MathDiffOperation(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+static TreeNode_t* MathDiffOperation(MathCtx_t* math_ctx, TreeNode_t* node,
+                                     size_t diff_var_ind, MathCtx_t* src_math_ctx)
 {
     assert(math_ctx != NULL);
     assert(node     != NULL);
 
-    return MATH_DIFF_OPER_TABLE[node->data.value.op](math_ctx, node, diff_var_ind);
+    return MATH_DIFF_OPER_TABLE[node->data.value.op](math_ctx, node, diff_var_ind, src_math_ctx);
 }
 
 //------------------------------------------------------------------------------------------
 
-static TreeNode_t* MathDiffDeg(MathCtx_t* math_ctx, TreeNode_t* node, size_t diff_var_ind)
+/* f(x) ^ g(x)
+    f == cL
+    g == cR
+    d/dx(f) == dL
+    d/dx(g) == dR
+
+    d/dx ( e^(ln(f)*g) )
+    = e^(ln(f)*g) * ( g * d/dx(f) * 1/f +  ln(f) * d/dx(g) ) */
+
+static TreeNode_t* MathDiffDeg(MathCtx_t* math_ctx, TreeNode_t* node,
+                               size_t diff_var_ind, MathCtx_t* src_math_ctx)
 {
     assert(math_ctx != NULL);
     assert(node     != NULL);
@@ -230,16 +240,6 @@ static TreeNode_t* MathDiffDeg(MathCtx_t* math_ctx, TreeNode_t* node, size_t dif
     {
         return MUL_(MUL_(cR, DEG_(cL, NUM_(numR - 1))), dL);
     }
-
-    /* f(x) ^ g(x)
-        f == cL
-        g == cR
-        d/dx(f) == dL
-        d/dx(g) == dR
-
-     d/dx ( e^(ln(f)*g) )
-     = e^(ln(f)*g) * d/dx (ln(f)*g)
-     = e^(ln(f)*g) * ( g * d/dx(f) * 1/f +  ln(f) * d/dx(g) ) */
 
     return MUL_(EXP_(MUL_(LN_(cL), cR)),
                 ADD_(MUL_(MUL_(cR, dL),

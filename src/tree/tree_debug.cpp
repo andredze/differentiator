@@ -266,7 +266,7 @@ TreeErr_t vTreeDump(MathCtx_t*      math_ctx,
 
     if ((graph_error = TreeGraphDump(math_ctx)))
     {
-        fflush(debug.fp);
+        fflush(fp);
         return graph_error;
     }
 
