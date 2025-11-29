@@ -209,7 +209,7 @@ R"(\documentclass[12pt, a4paper]{article}
 \usepackage[T2A]{fontenc}
 \usepackage[russian]{babel}
 
-\title{ХУИТА (МАТАН)}
+\title{ААААААААА БЛЯ (МАТАН)}
 \author{Киселев Андрей}
 \date{\today}
 
@@ -358,7 +358,7 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
             break;
 
         case TYPE_OP:
-            fprintf(fp, "%s", OP_CASES_TABLE[data.value.op].str);
+            fprintf(fp, "%s", OP_CASES_TABLE[data.value.op].tex_str);
             break;
 
         case TYPE_VAR:

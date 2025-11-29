@@ -11,15 +11,15 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathOpenTexFile   ();
-MathErr_t MathCloseTexFile  ();
-void      MathTexSection    (const char* fmt, ...);
-void      MathTexMessage    (const char* fmt, ...);
-void      MathTexEval       (MathCtx_t* math_ctx, double result);
-MathErr_t MathCtxTexDump    (MathCtx_t* math_ctx, const char* fmt, ...);
-MathErr_t vMathCtxTexDump   (MathCtx_t* math_ctx, const char* fmt, va_list args);
-void      MathTexDumpSubtree    (TreeNode_t* node, MathCtx_t* math_ctx);
-void      MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx);
+MathErr_t MathOpenTexFile           ();
+MathErr_t MathCloseTexFile          ();
+void      MathTexSection            (const char* fmt, ...);
+void      MathTexMessage            (const char* fmt, ...);
+void      MathTexEval               (MathCtx_t* math_ctx, double result);
+MathErr_t MathCtxTexDump            (MathCtx_t* math_ctx, const char* fmt, ...);
+MathErr_t vMathCtxTexDump           (MathCtx_t* math_ctx, const char* fmt, va_list args);
+void      MathTexDumpSubtree        (TreeNode_t* node, MathCtx_t* math_ctx);
+void      MathTexDumpDiffSubtree    (TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

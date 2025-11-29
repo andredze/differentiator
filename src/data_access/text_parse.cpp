@@ -187,6 +187,8 @@ static TreeNode_t* GetE(MathCtx_t* math_ctx, Expr_t* expr)
             node1 = ADD_(node1, node2);
         else
             node1 = SUB_(node1, node2);
+
+        SkipSpaces(expr);
     }
 
     return node1;
@@ -223,6 +225,8 @@ static TreeNode_t* GetT(MathCtx_t* math_ctx, Expr_t* expr)
 
             node1 = DIV_(node1, node2);
         }
+
+        SkipSpaces(expr);
     }
 
     return node1;
@@ -347,14 +351,20 @@ static TreeNode_t* GetU(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, s
 
     MathOp_t op_code = OP_UNKNOWN;
 
-    for (size_t i = 0; i < UNARY_OP_CASES_TABLE_SIZE; i++)
+    for (size_t i = 0; i < OP_CASES_TABLE_SIZE; i++)
     {
-        if (strncmp(word_start_p, UNARY_OP_CASES_TABLE[i].str, word_len) == 0)
-            op_code = UNARY_OP_CASES_TABLE[i].code;
+        if (OP_CASES_TABLE[i].args_count != 1)
+            continue;
+
+        if (strncmp(word_start_p, OP_CASES_TABLE[i].str, word_len) == 0)
+            op_code = OP_CASES_TABLE[i].code;
     }
 
     if (op_code == OP_UNKNOWN)
         return NULL;
+
+    TREE_READ_BUFFER_DUMP(expr, "GET V: READ operation \"OP = %s (code = %d)\"",
+                                OP_CASES_TABLE[op_code].str, op_code);
 
     if (*expr->cur_p != '(')
         SYNTAX_ERROR(math_ctx, expr, "no opening bracket after function");
@@ -367,9 +377,6 @@ static TreeNode_t* GetU(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, s
         SYNTAX_ERROR(math_ctx, expr, "no closing bracket after function");
 
     expr->cur_p++;
-
-    TREE_READ_BUFFER_DUMP(expr, "GET V: READ operation \"OP = %s (code = %d)\"",
-                                UNARY_OP_CASES_TABLE[op_code].str, op_code);
 
     TreeNode_t* node = MathNodeCtor(math_ctx, { TYPE_OP, { .op = op_code }}, NULL, node2);
 
