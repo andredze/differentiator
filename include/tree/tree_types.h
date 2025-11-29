@@ -33,7 +33,8 @@ typedef enum MathOperations
     OP_TG,
     OP_CTG,
     OP_LN,
-    OP_DEG
+    OP_DEG,
+    OP_UNKNOWN
 } MathOp_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
@@ -66,7 +67,27 @@ const OpCase_t OP_CASES_TABLE[] =
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-const size_t OP_CASES_TABLE_SIZE = sizeof(OP_CASES_TABLE) / sizeof(OP_CASES_TABLE[0]);
+typedef struct UnaryOpCase
+{
+    MathOp_t    code;
+    const char* str;
+} UnaryOpCase_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+const UnaryOpCase_t UNARY_OP_CASES_TABLE[] =
+{
+    {OP_SIN, "sin"},
+    {OP_COS, "cos"},
+    {OP_TG,  "tg" },
+    {OP_CTG, "ctg"},
+    {OP_LN,  "ln" }
+};
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+const size_t OP_CASES_TABLE_SIZE       = sizeof(OP_CASES_TABLE)       / sizeof(OP_CASES_TABLE[0]);
+const size_t UNARY_OP_CASES_TABLE_SIZE = sizeof(UNARY_OP_CASES_TABLE) / sizeof(UNARY_OP_CASES_TABLE[0]);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

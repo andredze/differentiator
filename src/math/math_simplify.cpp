@@ -139,6 +139,7 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
         case OP_TG:
         case OP_CTG:
         case OP_LN:
+        case OP_UNKNOWN:
         default:
             PRINTERR("Given node is not a binary operation");
             return MATH_UNKNOWN_OP;

@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "common.h"
 #include "math_types.h"
 #include "math_funcs.h"
 #include "math_tex.h"

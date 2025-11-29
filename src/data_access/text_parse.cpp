@@ -44,20 +44,30 @@
 
 //------------------------------------------------------------------------------------------
 
-static void PrintSyntaxError(Expr_t* expr,   const char* file, const char* func,
-                             const int line, const char* fmt, ...);
+static TreeNode_t* GetG             (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetE             (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetT             (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetP             (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetPBracketsCase (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetN             (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetString        (MathCtx_t* math_ctx, Expr_t* expr);
 
-static void SkipSpaces(Expr_t* expr);
+static TreeNode_t* GetU             (MathCtx_t* math_ctx, Expr_t* expr,
+                                     char* word_start_p, size_t word_len);
 
-static TreeNode_t* GetG (MathCtx_t* math_ctx, Expr_t* expr);
-static TreeNode_t* GetE (MathCtx_t* math_ctx, Expr_t* expr);
-static TreeNode_t* GetT (MathCtx_t* math_ctx, Expr_t* expr);
-static TreeNode_t* GetP (MathCtx_t* math_ctx, Expr_t* expr);
-static TreeNode_t* GetPBracketsCase(MathCtx_t* math_ctx, Expr_t* expr);
-static TreeNode_t* GetN (MathCtx_t* math_ctx, Expr_t* expr);
-static TreeNode_t* GetV (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetV             (MathCtx_t* math_ctx, Expr_t* expr,
+                                     char* word_start_p, size_t word_len);
 
-static MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, MathData_t* data);
+static MathErr_t   PutVarInTable    (MathCtx_t* math_ctx, char* str,
+                                     size_t str_len, MathData_t* data);
+
+static void SkipSpaces              (Expr_t* expr);
+static int  IsAcceptableStartSymbol (char ch);
+static int  IsAcceptableSymbol      (char ch);
+
+static void PrintSyntaxError        (Expr_t* expr,     const char* file,
+                                     const char* func, const int line,
+                                     const char* fmt, ...);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -231,7 +241,7 @@ static TreeNode_t* GetP(MathCtx_t* math_ctx, Expr_t* expr)
     else if (isdigit(*expr->cur_p))
         node = GetN(math_ctx, expr);
     else
-        node = GetV(math_ctx, expr);
+        node = GetString(math_ctx, expr);
 
     return node;
 }
@@ -288,22 +298,109 @@ static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
 
 // TODO - переделать однобуквенные переменные на многобуквенные
 
-static TreeNode_t* GetV(MathCtx_t* math_ctx, Expr_t* expr)
+static TreeNode_t* GetString(MathCtx_t* math_ctx, Expr_t* expr)
 {
+    DPRINTF("\tGetString:\n");
     SkipSpaces(expr);
 
-    if (!isalpha(*expr->cur_p))
-        SYNTAX_ERROR(math_ctx, expr, "not a letter at start of variable");
+    if (!IsAcceptableStartSymbol(*expr->cur_p))
+        SYNTAX_ERROR(math_ctx, expr, "unacceptable symbol at start of variable | unary operation");
 
+    char* word_start_p = expr->cur_p;
+    DPRINTF("\t\texpr->cur_p = %p;\n", expr->cur_p);
+
+    while (IsAcceptableSymbol(*expr->cur_p))
+    {
+        DPRINTF("\t\tchar = %c; is_alpha = %d;\n", *expr->cur_p, IsAcceptableSymbol(*expr->cur_p));
+        expr->cur_p++;
+        DPRINTF("\t\texpr->cur_p = %p;\n", expr->cur_p);
+    }
+
+    size_t word_len = (size_t) (expr->cur_p - word_start_p);
+
+    DPRINTF("word_start_p = %s; word_len = %zu;\n", word_start_p, word_len);
+
+    TreeNode_t* node = GetU(math_ctx, expr, word_start_p, word_len);
+
+    DPRINTF("after GetU node = %p;\n", node);
+
+    if (node != NULL)
+        return node;
+
+    node = GetV(math_ctx, expr, word_start_p, word_len);
+
+    return node;
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* GetU(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, size_t word_len)
+{
+
+//     uint64_t hash = GetHash();
+//
+//     op_ptr = bsearch();
+//
+//     if (op_ptr == NULL)
+//         return NULL;
+
+
+    MathOp_t op_code = OP_UNKNOWN;
+
+    for (size_t i = 0; i < UNARY_OP_CASES_TABLE_SIZE; i++)
+    {
+        if (strncmp(word_start_p, UNARY_OP_CASES_TABLE[i].str, word_len) == 0)
+            op_code = UNARY_OP_CASES_TABLE[i].code;
+    }
+
+    if (op_code == OP_UNKNOWN)
+        return NULL;
+
+    if (*expr->cur_p != '(')
+        SYNTAX_ERROR(math_ctx, expr, "no opening bracket after function");
+
+    expr->cur_p++;
+
+    TreeNode_t* node2 = GetE(math_ctx, expr);
+
+    if (*expr->cur_p != ')')
+        SYNTAX_ERROR(math_ctx, expr, "no closing bracket after function");
+
+    expr->cur_p++;
+
+    TREE_READ_BUFFER_DUMP(expr, "GET V: READ operation \"OP = %s (code = %d)\"",
+                                UNARY_OP_CASES_TABLE[op_code].str, op_code);
+
+    TreeNode_t* node = MathNodeCtor(math_ctx, { TYPE_OP, { .op = op_code }}, NULL, node2);
+
+    return node;
+}
+
+//------------------------------------------------------------------------------------------
+
+static int IsAcceptableStartSymbol(char ch)
+{
+    return isalpha(ch) || ch == '_';
+}
+
+//------------------------------------------------------------------------------------------
+
+static int IsAcceptableSymbol(char ch)
+{
+    return isalpha(ch) || isdigit(ch) || ch == '_';
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* GetV(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, size_t word_len)
+{
     TreeNode_t* node = MathNodeCtor(math_ctx, {.type = TYPE_VAR}, NULL, NULL);
 
     if (node == NULL)
         return NULL;
 
-    if (PutVarInTable(math_ctx, expr->cur_p, 1, &node->data))
+    if (PutVarInTable(math_ctx, word_start_p, word_len, &node->data))
         return NULL;
-
-    expr->cur_p++;
 
     TREE_READ_BUFFER_DUMP(expr, "GET V: READ variable \"vars[%d] = %s\"",
                                 node->data.value.var,

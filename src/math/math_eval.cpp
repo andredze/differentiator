@@ -206,6 +206,7 @@ MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
             PRINTERR("Given operation is unary");
             return MATH_UNKNOWN_OP;
 
+        case OP_UNKNOWN:
         default:
             PRINTERR("Unknown binary op");
             return MATH_UNKNOWN_OP;
@@ -252,6 +253,7 @@ static MathErr_t MathExecuteUnaryOperation(MathOp_t operation,
             PRINTERR("Given operation is binary");
             return MATH_UNKNOWN_OP;
 
+        case OP_UNKNOWN:
         default:
             PRINTERR("Unknown unary op");
             return MATH_UNKNOWN_OP;
