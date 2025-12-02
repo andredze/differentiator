@@ -24,11 +24,11 @@ SOURCES = src/main.cpp 						\
           src/tree/tree_commands.cpp 		\
           src/tree/tree_debug.cpp 			\
           src/colors.cpp					\
-		  src/math/math_funcs.cpp			\
-		  src/math/math_eval.cpp			\
-		  src/math/math_diff.cpp			\
-		  src/math/math_tex.cpp				\
-		  src/math/math_simplify.cpp		\
+		  src/math/funcs.cpp				\
+		  src/math/eval.cpp					\
+		  src/math/diff.cpp					\
+		  src/math/tex.cpp					\
+		  src/math/simplify.cpp				\
 		  src/data_access/text_parse.cpp
 
 ifdef DEBUG

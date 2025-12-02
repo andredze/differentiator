@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "math_types.h"
-#include "math_funcs.h"
-#include "math_tex.h"
+#include "funcs.h"
+#include "tex.h"
 #include "tree_types.h"
 #include "tree_commands.h"
 

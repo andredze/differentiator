@@ -1,4 +1,4 @@
-#include "math_tex.h"
+#include "tex.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -257,7 +257,7 @@ static void TexConvertToPdf()
     char command[MAX_COMMAND_LEN] = {};
 
     snprintf(command, sizeof(command),
-            "pdflatex -interaction=nonstopmode -halt-on-error %s",
+            "pdflatex -interaction=nonstopmode -halt-on-error %s > /dev/null 2>&1",
             TEX_FILE_NAME);
 
     system("rm -rf *.pdf");

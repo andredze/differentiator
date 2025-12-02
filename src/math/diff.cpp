@@ -1,4 +1,4 @@
-#include "math_diff.h"
+#include "diff.h"
 
 /* ==================== Domain Specific Language for differentiation ==================== */
 

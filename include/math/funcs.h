@@ -5,7 +5,7 @@
 
 #include "tree_commands.h"
 #include "math_types.h"
-#include "math_tex.h"
+#include "tex.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

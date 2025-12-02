@@ -1,10 +1,10 @@
 #include "tree_commands.h"
 #include "data_read.h"
 #include "text_parse.h"
-#include "math_funcs.h"
-#include "math_eval.h"
-#include "math_diff.h"
-#include "math_simplify.h"
+#include "funcs.h"
+#include "eval.h"
+#include "diff.h"
+#include "simplify.h"
 
 //------------------------------------------------------------------------------------------
 

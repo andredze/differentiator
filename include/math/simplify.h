@@ -1,18 +1,19 @@
-#ifndef MATH_DIFF_H
-#define MATH_DIFF_H
+#ifndef MATH_SIMPLIFY_H
+#define MATH_SIMPLIFY_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "math_types.h"
-#include "math_funcs.h"
-#include "math_tex.h"
-#include <math.h>
-#include <stdlib.h>
+#include "eval.h"
+#include "tree_types.h"
+#include "tree_commands.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathDifferentiate (MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var);
+MathErr_t MathSimplify          (MathCtx_t* math_ctx);
+MathErr_t MathDeleteNeutral     (MathCtx_t* math_ctx);
+MathErr_t MathConvoluteConsts   (MathCtx_t* math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#endif /* MATH_DIFF_H */
+#endif /* MATH_SIMPLIFY_H */

@@ -1,20 +1,18 @@
-#ifndef MATH_EVAL_H
-#define MATH_EVAL_H
+#ifndef MATH_DIFF_H
+#define MATH_DIFF_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "math_types.h"
-#include "math_funcs.h"
-#include "math_tex.h"
+#include "funcs.h"
+#include "tex.h"
 #include <math.h>
+#include <stdlib.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathEvaluate (MathCtx_t* math_ctx, double* presult);
-
-MathErr_t MathExecuteBinaryOperation(MathOp_t operation, double  left_result,
-                                     double  right_result, double* result);
+MathErr_t MathDifferentiate (MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#endif /* MATH_EVAL_H */
+#endif /* MATH_DIFF_H */

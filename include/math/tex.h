@@ -6,7 +6,7 @@
 #include "math_types.h"
 #include "tree_types.h"
 #include "tree_commands.h"
-#include "math_funcs.h"
+#include "funcs.h"
 #include <stdarg.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————

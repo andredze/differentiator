@@ -1,4 +1,4 @@
-#include "math_simplify.h"
+#include "simplify.h"
 
 /* ===================== Domain Specific Language for simplification ==================== */
 

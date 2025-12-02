@@ -1,5 +1,6 @@
 run
 
+*.toc
 *.log
 *.aux
 *.dot

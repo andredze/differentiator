@@ -1,19 +1,20 @@
-#ifndef MATH_SIMPLIFY_H
-#define MATH_SIMPLIFY_H
+#ifndef MATH_EVAL_H
+#define MATH_EVAL_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "math_types.h"
-#include "math_eval.h"
-#include "tree_types.h"
-#include "tree_commands.h"
+#include "funcs.h"
+#include "tex.h"
+#include <math.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathSimplify          (MathCtx_t* math_ctx);
-MathErr_t MathDeleteNeutral     (MathCtx_t* math_ctx);
-MathErr_t MathConvoluteConsts   (MathCtx_t* math_ctx);
+MathErr_t MathEvaluate (MathCtx_t* math_ctx, double* presult);
+
+MathErr_t MathExecuteBinaryOperation(MathOp_t operation, double  left_result,
+                                     double  right_result, double* result);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#endif /* MATH_SIMPLIFY_H */
+#endif /* MATH_EVAL_H */

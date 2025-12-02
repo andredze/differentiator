@@ -6,7 +6,7 @@
 #include "tree_commands.h"
 #include "tree_debug.h"
 #include <sys/stat.h>
-#include "math_funcs.h"
+#include "funcs.h"
 #include "text_parse.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
