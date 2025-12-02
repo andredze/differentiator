@@ -44,6 +44,7 @@ static TreeNode_t* GetD             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetP             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetPBracketsCase (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetN             (MathCtx_t* math_ctx, Expr_t* expr);
+static int         GetFract         (Expr_t*    expr,     double* value);
 static TreeNode_t* GetString        (MathCtx_t* math_ctx, Expr_t* expr);
 
 static TreeNode_t* GetU             (MathCtx_t* math_ctx,     Expr_t*     expr,
@@ -322,6 +323,25 @@ static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
         expr->cur_p++;
     }
 
+    if (start == expr->cur_p)
+        SYNTAX_ERROR(math_ctx, expr, "Unknown symbol: not a number");
+
+    if (GetFract(expr, &value) == -1)
+        SYNTAX_ERROR(math_ctx, expr, "no numbers after point");
+
+    TreeNode_t* node = NUM_(value);
+
+    TREE_READ_BUFFER_DUMP(expr, "GET N: READ number \"%lg\"", value);
+
+    return node;
+}
+
+//------------------------------------------------------------------------------------------
+
+static int GetFract(Expr_t* expr, double* value)
+{
+    assert(expr != NULL);
+
     if ('.' == *expr->cur_p)
     {
         char*  float_start = ++expr->cur_p;
@@ -329,23 +349,16 @@ static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
 
         while ('0' <= *expr->cur_p && *expr->cur_p <= '9')
         {
-            value += coeff * (*expr->cur_p - '0');
+            *value += coeff * (*expr->cur_p - '0');
             coeff /= 10;
             expr->cur_p++;
         }
 
         if (float_start == expr->cur_p)
-            SYNTAX_ERROR(math_ctx, expr, "no numbers after point");
+            return -1;
     }
 
-    if (start == expr->cur_p)
-        SYNTAX_ERROR(math_ctx, expr, "Unknown symbol: not a number");
-
-    TreeNode_t* node = NUM_(value);
-
-    TREE_READ_BUFFER_DUMP(expr, "GET N: READ number \"%lg\"", value);
-
-    return node;
+    return 0;
 }
 
 //------------------------------------------------------------------------------------------

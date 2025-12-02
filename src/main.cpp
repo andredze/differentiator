@@ -17,18 +17,10 @@ int main()
     MathOpenTexFile();
 
     do {
+        MathTexChapter("Обычная функция");
+
         if (MathCtxCtor(&math_ctx, 0))
             break;
-
-//         const char* buffer = "3+5$";
-//         const char* cur_p  = buffer;
-//
-//         Expr_t expr = { .buffer = buffer, .cur_p = cur_p };
-//
-//         if (MathParseText(&math_ctx, &expr))
-//             break;
-//
-//         break;
 
         if (TreeReadInputData(&math_ctx))
             break;
@@ -40,6 +32,8 @@ int main()
 
         if (MathEvaluate(&math_ctx, &result))
             break;
+
+        MathTexChapter("Первая производная");
 
         if (MathCtxCtor(&diff_math_ctx, 0))
             break;
@@ -54,11 +48,12 @@ int main()
             break;
     } while (0);
 
-    MathCloseTexFile();
     MathCtxDtor(&diff_math_ctx);
     MathCtxDtor(&math_ctx);
 
     TreeCloseLogFile();
+
+    MathCloseTexFile();
 
     return EXIT_SUCCESS;
 }

@@ -42,6 +42,25 @@ void MathTexMessage(const char* fmt, ...)
 
 //------------------------------------------------------------------------------------------
 
+void MathTexChapter(const char* fmt, ...)
+{
+    va_list args = {};
+
+    va_start(args, fmt);
+
+    char buffer[MAX_MESSAGE_LEN] = {};
+
+    vsprintf(buffer, fmt, args);
+
+    va_end(args);
+
+    fprintf(fp, "\\chapter{%s}\n", buffer);
+
+    fflush(fp);
+}
+
+//------------------------------------------------------------------------------------------
+
 void MathTexSection(const char* fmt, ...)
 {
     va_list args = {};
@@ -119,7 +138,7 @@ void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* 
     fprintf(fp, "\\[");
     fprintf(fp, R"(\frac{d}{d%s})""(", math_ctx->vars.data[0].str);
 
-    // TODO: как не терять переменные??? нужно хранить еще и src_mathctx????
+    // TODO: как не терять переменные??? нужно передавать еще и src_mathctx????
 
     MathTexDumpNode(node, math_ctx);
 
@@ -204,7 +223,7 @@ MathErr_t MathCloseTexFile()
 static void TexDumpTitle()
 {
     fprintf(fp,
-R"(\documentclass[12pt, a4paper]{article}
+R"(\documentclass[12pt, a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[T2A]{fontenc}
 \usepackage[russian]{babel}
@@ -216,6 +235,9 @@ R"(\documentclass[12pt, a4paper]{article}
 \begin{document}
 
 \maketitle
+
+\tableofcontents
+
 )");
     fflush(fp);
 }
@@ -235,8 +257,10 @@ static void TexConvertToPdf()
     char command[MAX_COMMAND_LEN] = {};
 
     snprintf(command, sizeof(command),
-            "pdflatex -interaction=batchmode math_log.tex %s",
+            "pdflatex -interaction=nonstopmode -halt-on-error %s",
             TEX_FILE_NAME);
+
+    system("rm -rf *.pdf");
 
     system(command);
 

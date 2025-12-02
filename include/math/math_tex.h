@@ -14,6 +14,7 @@
 MathErr_t MathOpenTexFile           ();
 MathErr_t MathCloseTexFile          ();
 void      MathTexSection            (const char* fmt, ...);
+void      MathTexChapter            (const char* fmt, ...);
 void      MathTexMessage            (const char* fmt, ...);
 void      MathTexEval               (MathCtx_t* math_ctx, double result);
 MathErr_t MathCtxTexDump            (MathCtx_t* math_ctx, const char* fmt, ...);
