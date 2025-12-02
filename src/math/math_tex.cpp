@@ -278,17 +278,17 @@ static int MathNodeMatchesOp(TreeNode_t* node, MathOp_t op)
 
 static void MathTexDumpNodeDivCase(TreeNode_t* node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, "\\frac{");
+    fprintf(fp, " \\frac{ ");
 
     if (node->left != NULL)
         MathTexDumpNode(node->left, math_ctx);
 
-    fprintf(fp, "}{");
+    fprintf(fp, " }{ ");
 
     if (node->right != NULL)
         MathTexDumpNode(node->right, math_ctx);
 
-    fprintf(fp, "}");
+    fprintf(fp, " } ");
 }
 
 //------------------------------------------------------------------------------------------
@@ -328,7 +328,7 @@ static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket)
 
     if (node->data.value.op == OP_ADD ||
         node->data.value.op == OP_SUB)
-        fprintf(fp, "%c", bracket);
+        fprintf(fp, " %c ", bracket);
 }
 
 //------------------------------------------------------------------------------------------
@@ -339,7 +339,7 @@ static void MathTexDumpBraceIfNeeded(TreeNode_t* node, char bracket)
         return;
 
     if (node->data.value.op == OP_DEG)
-        fprintf(fp, "%c", bracket);
+        fprintf(fp, " %c ", bracket);
 }
 
 //------------------------------------------------------------------------------------------
@@ -348,9 +348,6 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);
 
-    // NOTE: предварительное решение
-    // TODO: проверять приоритеты с помощью узлов родителя
-
     switch (data.type)
     {
         case TYPE_NUM:
@@ -358,18 +355,16 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
             break;
 
         case TYPE_OP:
-            fprintf(fp, "%s", OP_CASES_TABLE[data.value.op].tex_str);
+            fprintf(fp, " %s ", OP_CASES_TABLE[data.value.op].tex_str);
             break;
 
         case TYPE_VAR:
             if (math_ctx->dump_values == 0)
             {
-                // DPRINTF("data.value.var = %d;\n", data.value.var);
-                // if (math_ctx->vars.data[data.value.var].str != NULL)
-                fprintf(fp, "%s", math_ctx->vars.data[data.value.var].str);
+                fprintf(fp, " %s ", math_ctx->vars.data[data.value.var].str);
             }
             else
-                fprintf(fp, "%lg", math_ctx->vars.data[data.value.var].value);
+                fprintf(fp, " %lg ", math_ctx->vars.data[data.value.var].value);
             break;
 
         default:
@@ -398,15 +393,15 @@ static void MathTexDumpNumber(double num)
 {
     if (CompareDoubles(num, EULER_NUMBER) == 0)
     {
-        fprintf(fp, "e ");
+        fprintf(fp, " e ");
     }
     else if (CompareDoubles(num, PI_NUMBER) == 0)
     {
-        fprintf(fp, "\\pi  ");
+        fprintf(fp, " \\pi  ");
     }
     else
     {
-        fprintf(fp, "%lg ", num);
+        fprintf(fp, " %lg ", num);
     }
 }
 

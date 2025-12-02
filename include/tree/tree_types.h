@@ -58,11 +58,11 @@ const OpCase_t OP_CASES_TABLE[] =
     [OP_SUB] = {OP_SUB, "-",   "-",      2, "#065f96ff", "#58bbf8ff", "#043351ff"},
     [OP_MUL] = {OP_MUL, "*",   "\\cdot", 2, "#065f96ff", "#58bbf8ff", "#043351ff"},
     [OP_DIV] = {OP_DIV, "/",   "/",      2, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_SIN] = {OP_SIN, "sin", "sin",    1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_COS] = {OP_COS, "cos", "cos",    1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_TG]  = {OP_TG,  "tg",  "tg",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_CTG] = {OP_CTG, "ctg", "ctg",    1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_LN]  = {OP_LN,  "ln",  "ln",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_SIN] = {OP_SIN, "sin", "\\sin",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_COS] = {OP_COS, "cos", "\\cos",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_TG]  = {OP_TG,  "tg",  "\\tan",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_CTG] = {OP_CTG, "ctg", "\\cot",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_LN]  = {OP_LN,  "ln",  "\\ln",   1, "#065f96ff", "#58bbf8ff", "#043351ff"},
     [OP_DEG] = {OP_DEG, "^",   "^",      2, "#065f96ff", "#58bbf8ff", "#043351ff"}
 };
 
