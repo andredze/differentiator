@@ -17,14 +17,7 @@
 #define MUL_(lnode, rnode) MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = OP_MUL }}, (lnode), (rnode))
 #define DIV_(lnode, rnode) MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = OP_DIV }}, (lnode), (rnode))
 #define DEG_(lnode, rnode) MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = OP_DEG }}, (lnode), (rnode))
-
-#define SIN_(node)         MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = OP_SIN }}, NULL, (node))
-#define COS_(node)         MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = OP_COS }}, NULL, (node))
-#define LN_(node)          MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = OP_LN  }}, NULL, (node))
-
-#define SQRT_(node)        DEG_((node), NUM_(0.5))
-#define SQR_(node)         DEG_((node), NUM_(2))
-#define EXP_(node)         DEG_(NUM_(EULER_NUMBER), (node))
+#define UNARY_(oper, node) MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = (oper) }},  NULL,   (node) )
 
 /* ====================================================================================== */
 
@@ -47,19 +40,20 @@
 static TreeNode_t* GetG             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetE             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetT             (MathCtx_t* math_ctx, Expr_t* expr);
+static TreeNode_t* GetD             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetP             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetPBracketsCase (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetN             (MathCtx_t* math_ctx, Expr_t* expr);
 static TreeNode_t* GetString        (MathCtx_t* math_ctx, Expr_t* expr);
 
-static TreeNode_t* GetU             (MathCtx_t* math_ctx, Expr_t* expr,
-                                     char* word_start_p, size_t word_len);
+static TreeNode_t* GetU             (MathCtx_t* math_ctx,     Expr_t*     expr,
+                                     char*      word_start_p, size_t      word_len);
 
-static TreeNode_t* GetV             (MathCtx_t* math_ctx, Expr_t* expr,
-                                     char* word_start_p, size_t word_len);
+static TreeNode_t* GetV             (MathCtx_t* math_ctx,     Expr_t*     expr,
+                                     char*      word_start_p, size_t      word_len);
 
-static MathErr_t   PutVarInTable    (MathCtx_t* math_ctx, char* str,
-                                     size_t str_len, MathData_t* data);
+static MathErr_t   PutVarInTable    (MathCtx_t* math_ctx,     char*       str,
+                                     size_t     str_len,      MathData_t* data);
 
 static void SkipSpaces              (Expr_t* expr);
 static int  IsAcceptableStartSymbol (char ch);
@@ -198,7 +192,7 @@ static TreeNode_t* GetE(MathCtx_t* math_ctx, Expr_t* expr)
 
 static TreeNode_t* GetT(MathCtx_t* math_ctx, Expr_t* expr)
 {
-    TreeNode_t* node1 = GetP(math_ctx, expr);
+    TreeNode_t* node1 = GetD(math_ctx, expr);
 
     if (node1 == NULL)
         return NULL;
@@ -211,7 +205,7 @@ static TreeNode_t* GetT(MathCtx_t* math_ctx, Expr_t* expr)
         expr->cur_p++;
         TREE_READ_BUFFER_DUMP(expr, "GET T: READ \"* | /\"");
 
-        TreeNode_t* node2 = GetP(math_ctx, expr);
+        TreeNode_t* node2 = GetD(math_ctx, expr);
 
         if (node2 == NULL)
             return NULL;
@@ -225,6 +219,39 @@ static TreeNode_t* GetT(MathCtx_t* math_ctx, Expr_t* expr)
 
             node1 = DIV_(node1, node2);
         }
+
+        SkipSpaces(expr);
+    }
+
+    return node1;
+}
+
+//------------------------------------------------------------------------------------------
+
+static TreeNode_t* GetD(MathCtx_t* math_ctx, Expr_t* expr)
+{
+    TreeNode_t* node1 = GetP(math_ctx, expr);
+
+    if (node1 == NULL)
+        return NULL;
+
+    SkipSpaces(expr);
+
+    while (*expr->cur_p == '^')
+    {
+        expr->cur_p++;
+
+        TREE_READ_BUFFER_DUMP(expr, "GET POWER: READ \"^\"");
+
+        node1 = DEG_(node1, NULL);
+
+        TreeNode_t* node2 = GetP(math_ctx, expr);
+
+        if (node2 == NULL)
+            return NULL;
+
+        node1->right  = node2;
+        node2->parent = node1;
 
         SkipSpaces(expr);
     }
@@ -277,15 +304,38 @@ static TreeNode_t* GetPBracketsCase(MathCtx_t* math_ctx, Expr_t* expr)
 
 static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
 {
+    DPRINTF("\tGetN\n");
+
     SkipSpaces(expr);
 
     const char* start = expr->cur_p;
     double      value = 0;
 
+    if (!('0' <= *expr->cur_p && *expr->cur_p <= '9'))
+    {
+        SYNTAX_ERROR(math_ctx, expr, "Unknown symbol: not a number");
+    }
+
     while ('0' <= *expr->cur_p && *expr->cur_p <= '9')
     {
         value = value * 10 + (*expr->cur_p - '0');
         expr->cur_p++;
+    }
+
+    if ('.' == *expr->cur_p)
+    {
+        char*  float_start = ++expr->cur_p;
+        double coeff       = 0.1;
+
+        while ('0' <= *expr->cur_p && *expr->cur_p <= '9')
+        {
+            value += coeff * (*expr->cur_p - '0');
+            coeff /= 10;
+            expr->cur_p++;
+        }
+
+        if (float_start == expr->cur_p)
+            SYNTAX_ERROR(math_ctx, expr, "no numbers after point");
     }
 
     if (start == expr->cur_p)
@@ -299,8 +349,6 @@ static TreeNode_t* GetN(MathCtx_t* math_ctx, Expr_t* expr)
 }
 
 //------------------------------------------------------------------------------------------
-
-// TODO - переделать однобуквенные переменные на многобуквенные
 
 static TreeNode_t* GetString(MathCtx_t* math_ctx, Expr_t* expr)
 {
@@ -348,7 +396,6 @@ static TreeNode_t* GetU(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, s
 //     if (op_ptr == NULL)
 //         return NULL;
 
-
     MathOp_t op_code = OP_UNKNOWN;
 
     for (size_t i = 0; i < OP_CASES_TABLE_SIZE; i++)
@@ -378,9 +425,7 @@ static TreeNode_t* GetU(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, s
 
     expr->cur_p++;
 
-    TreeNode_t* node = MathNodeCtor(math_ctx, { TYPE_OP, { .op = op_code }}, NULL, node2);
-
-    return node;
+    return UNARY_(op_code, node2);
 }
 
 //------------------------------------------------------------------------------------------
@@ -463,21 +508,13 @@ static MathErr_t PutVarInTable(MathCtx_t* math_ctx, char* str, size_t str_len, M
 
 #undef ISVALUE_
 
-#undef numL
-#undef numR
-
-#undef typeL
-#undef typeR
-
 #undef NUM_
 
 #undef ADD_
 #undef SUB_
 #undef MUL_
 #undef DIV_
-
-#undef SQR_
-#undef SIN_
-#undef COS_
+#undef DEG_
+#undef UNARY_
 
 //==========================================================================================
