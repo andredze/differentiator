@@ -7,21 +7,23 @@
 
 /* ====================================================================================== */
 
-static int       MathNodeIsNum                  (TreeNode_t* node);
-static MathErr_t MathConvoluteNodeToNumber      (TreeNode_t* node, MathCtx_t* math_ctx, double number);
-static MathErr_t MathConvoluteLeftToCurrent     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathConvoluteRightToCurrent    (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathDeleteNeutralNode          (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathProcessNeutrals            (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathConvoluteConnectParent     (TreeNode_t* node, TreeNode_t* new_node);
-static MathErr_t MathProcessNeutralsAddCase     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathProcessNeutralsSubCase     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathProcessNeutralsAddSubCase  (TreeNode_t* node, MathCtx_t* math_ctx, MathOp_t op);
-static MathErr_t MathProcessNeutralsMulCase     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathProcessNeutralsDivCase     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathProcessNeutralsDegCase     (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathConvoluteConstsNode        (TreeNode_t* node, MathCtx_t* math_ctx);
-static MathErr_t MathConvoluteSingleNode        (TreeNode_t* node, MathCtx_t* math_ctx);
+static int       MathNodeIsNum                   (TreeNode_t* node);
+static MathErr_t MathConvoluteNodeToNumber       (TreeNode_t* node, MathCtx_t* math_ctx, double number);
+static MathErr_t MathConvoluteLeftToCurrent      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteRightToCurrent     (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathDeleteNeutralNode           (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutrals             (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteConnectParent      (TreeNode_t* node, TreeNode_t* new_node);
+static MathErr_t MathProcessNeutralsAddCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutralsSubCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutralsAddSubCase   (TreeNode_t* node, MathCtx_t* math_ctx, MathOp_t op);
+static MathErr_t MathProcessNeutralsMulCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutralsDivCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutralsDegCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathProcessNeutralsLogCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteConstsNode         (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteSingleNodeBinaryOp (TreeNode_t* node, MathCtx_t* math_ctx);
+static MathErr_t MathConvoluteSingleNodeUnaryOp  (TreeNode_t* node, MathCtx_t* math_ctx);
 
 //------------------------------------------------------------------------------------------
 
@@ -114,34 +116,24 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
 
     switch (node->data.value.op)
     {
-        case OP_ADD:
-            MathProcessNeutralsAddCase(node, math_ctx);
-            break;
+        case OP_ADD: MathProcessNeutralsAddCase(node, math_ctx); break;
+        case OP_SUB: MathProcessNeutralsSubCase(node, math_ctx); break;
+        case OP_MUL: MathProcessNeutralsMulCase(node, math_ctx); break;
+        case OP_DIV: MathProcessNeutralsDivCase(node, math_ctx); break;
+        case OP_DEG: MathProcessNeutralsDegCase(node, math_ctx); break;
+        case OP_LOG: MathProcessNeutralsLogCase(node, math_ctx); break;
 
-        case OP_SUB:
-            MathProcessNeutralsSubCase(node, math_ctx);
-            break;
+        case OP_SIN:  case OP_COS:  case OP_TG:  case OP_CTG:
+        case OP_SH:   case OP_CH:   case OP_TH:  case OP_CTH:
+        case OP_ASIN: case OP_ACOS: case OP_ATG: case OP_ACTG:
 
-        case OP_MUL:
-            MathProcessNeutralsMulCase(node, math_ctx);
-            break;
+        case OP_LN:   case OP_EXP:  case OP_SQRT:
+            PRINTERR("Given node is not a binary operation");
+            return MATH_UNKNOWN_OP;
 
-        case OP_DIV:
-            MathProcessNeutralsDivCase(node, math_ctx);
-            break;
-
-        case OP_DEG:
-            MathProcessNeutralsDegCase(node, math_ctx);
-            break;
-
-        case OP_SIN:
-        case OP_COS:
-        case OP_TG:
-        case OP_CTG:
-        case OP_LN:
         case OP_UNKNOWN:
         default:
-            PRINTERR("Given node is not a binary operation");
+            PRINTERR("Unknown operation");
             return MATH_UNKNOWN_OP;
     }
 
@@ -329,6 +321,19 @@ static MathErr_t MathProcessNeutralsDegCase(TreeNode_t* node, MathCtx_t* math_ct
 
 //------------------------------------------------------------------------------------------
 
+static MathErr_t MathProcessNeutralsLogCase(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    assert(node     != NULL);
+    assert(math_ctx != NULL);
+
+    if (ISVALUE_(right, 1.0))
+        return MathConvoluteNodeToNumber(node, math_ctx, 0.0);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
 MathErr_t MathConvoluteConsts(MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);
@@ -374,7 +379,12 @@ static MathErr_t MathConvoluteConstsNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
     if (MathNodeIsNum(node->left) && MathNodeIsNum(node->right))
     {
-        if ((error = MathConvoluteSingleNode(node, math_ctx)))
+        if ((error = MathConvoluteSingleNodeBinaryOp(node, math_ctx)))
+            return error;
+    }
+    else if (node->left == NULL && MathNodeIsNum(node->right))
+    {
+        if ((error = MathConvoluteSingleNodeUnaryOp(node, math_ctx)))
             return error;
     }
 
@@ -383,7 +393,7 @@ static MathErr_t MathConvoluteConstsNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
 //------------------------------------------------------------------------------------------
 
-static MathErr_t MathConvoluteSingleNode(TreeNode_t* node, MathCtx_t* math_ctx)
+static MathErr_t MathConvoluteSingleNodeBinaryOp(TreeNode_t* node, MathCtx_t* math_ctx)
 {
     assert(node     != NULL);
     assert(math_ctx != NULL);
@@ -408,7 +418,34 @@ static MathErr_t MathConvoluteSingleNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
     MathCtxTexDump(math_ctx, NULL, node);
 
-    // TODO: MathTexDumpSimplify(node, math_ctx);
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+static MathErr_t MathConvoluteSingleNodeUnaryOp(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    assert(node     != NULL);
+    assert(math_ctx != NULL);
+
+    double result = 0.0;
+    double rvalue = node->right->data.value.num;
+
+    if (MathExecuteUnaryOperation(node->data.value.op, rvalue, &result))
+    {
+        PRINTERR("Executing unary op failed");
+        return MATH_UNKNOWN_OP;
+    }
+    if (TreeSubtreesDtor(node, &math_ctx->tree))
+    {
+        PRINTERR("Deleting subtrees failed");
+        return MATH_TREE_ERROR;
+    }
+
+    node->data.type      = TYPE_NUM;
+    node->data.value.num = result;
+
+    MathCtxTexDump(math_ctx, NULL, node);
 
     return MATH_SUCCESS;
 }

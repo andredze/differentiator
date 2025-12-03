@@ -24,16 +24,12 @@ typedef enum MathDataType
 
 typedef enum MathOperations
 {
-    OP_ADD,
-    OP_SUB,
-    OP_MUL,
-    OP_DIV,
-    OP_SIN,
-    OP_COS,
-    OP_TG,
-    OP_CTG,
-    OP_LN,
-    OP_DEG,
+    OP_ADD,  OP_SUB,  OP_MUL, OP_DIV,
+    OP_LOG,  OP_LN,
+    OP_DEG,  OP_EXP,  OP_SQRT,
+    OP_SIN,  OP_COS,  OP_TG,  OP_CTG,
+    OP_SH,   OP_CH,   OP_TH,  OP_CTH,
+    OP_ASIN, OP_ACOS, OP_ATG, OP_ACTG,
     OP_UNKNOWN
 } MathOp_t;
 
@@ -54,21 +50,37 @@ typedef struct OpCase
 
 const OpCase_t OP_CASES_TABLE[] =
 {
-    [OP_ADD] = {OP_ADD, "+",   "+",      2, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_SUB] = {OP_SUB, "-",   "-",      2, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_MUL] = {OP_MUL, "*",   "\\cdot", 2, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_DIV] = {OP_DIV, "/",   "/",      2, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_SIN] = {OP_SIN, "sin", "\\sin",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_COS] = {OP_COS, "cos", "\\cos",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_TG]  = {OP_TG,  "tg",  "\\tan",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_CTG] = {OP_CTG, "ctg", "\\cot",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_LN]  = {OP_LN,  "ln",  "\\ln",   1, "#065f96ff", "#58bbf8ff", "#043351ff"},
-    [OP_DEG] = {OP_DEG, "^",   "^",      2, "#065f96ff", "#58bbf8ff", "#043351ff"}
+    [OP_ADD]  = {OP_ADD,  "+",      "+",         2, "#0d5854ff", "#4efabbff", "#0d4235ff"},
+    [OP_SUB]  = {OP_SUB,  "-",      "-",         2, "#0d5854ff", "#4efabbff", "#0d4235ff"},
+    [OP_MUL]  = {OP_MUL,  "*",      "\\cdot",    2, "#0d5854ff", "#4efabbff", "#0d4235ff"},
+    [OP_DIV]  = {OP_DIV,  "/",      "\\frac",    2, "#0d5854ff", "#4efabbff", "#0d4235ff"},
+
+    [OP_LOG]  = {OP_LOG,  "log",    "\\log",     2, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_LN ]  = {OP_LN,   "ln",     "\\ln",      1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+
+    [OP_DEG ] = {OP_DEG,  "^",      "^",         2, "#0d5854ff", "#4efabbff", "#0d4235ff"},
+    [OP_EXP ] = {OP_EXP,  "exp",    "\\exp",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_SQRT] = {OP_SQRT, "sqrt",   "\\sqrt",    1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+
+    [OP_SIN]  = {OP_SIN,  "sin",    "\\sin",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_COS]  = {OP_COS,  "cos",    "\\cos",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_TG ]  = {OP_TG,   "tg",     "\\tan",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_CTG]  = {OP_CTG,  "ctg",    "\\cot",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+
+    [OP_SH ]  = {OP_SH,   "sh",     "\\sh",      1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_CH ]  = {OP_CH,   "ch",     "\\ch",      1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_TH ]  = {OP_TH,   "th",     "\\th",      1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_CTH]  = {OP_CTH,  "cth",    "\\cth",     1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+
+    [OP_ASIN] = {OP_ASIN, "arcsin", "\\arcsin",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_ACOS] = {OP_ACOS, "arccos", "\\arccos",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_ATG ] = {OP_ATG,  "arctg",  "\\arctan",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
+    [OP_ACTG] = {OP_ACTG, "arcctg", "\\arccot",  1, "#065f96ff", "#58bbf8ff", "#043351ff"},
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-const size_t OP_CASES_TABLE_SIZE       = sizeof(OP_CASES_TABLE)       / sizeof(OP_CASES_TABLE[0]);
+const size_t OP_CASES_TABLE_SIZE = sizeof(OP_CASES_TABLE) / sizeof(OP_CASES_TABLE[0]);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -211,7 +223,7 @@ const TypeCase_t TYPE_CASES_TABLE[] =
 {
     [TYPE_VAR] = {TYPE_VAR, "VAR",  "Mrecord", "#006400", "#C0FFC0", "#006400"},
     [TYPE_NUM] = {TYPE_NUM, "NUM",  "Mrecord", "#990000", "#FFC0C0", "#990000"},
-    [TYPE_OP] =  {TYPE_OP,  "OPER", "record",  "#000064", "#C0C0FF", "#000064"}
+    [TYPE_OP ] = {TYPE_OP , "OPER", "record" , "#000064", "#C0C0FF", "#000064"}
 };
 
 //——————————————————————————————————————————————————————————————————————————————————————————

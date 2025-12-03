@@ -107,7 +107,7 @@ MathErr_t MathGetTaylorSeries(MathCtx_t* math_ctx, MathCtx_t* taylor_ctx,
     TREE_CALL_DUMP(taylor_ctx, "TAYLOR SERIES TREE");
 
     MathTexMessage("Саня педик, вот пруфы");
-    MathTexDumpTaylor(taylor_ctx, node, last_diff_degree);
+    MathTexDumpTaylor(taylor_ctx, taylor_ctx->tree.dummy->right, last_diff_degree);
 
     MathCtxDtor(&curr_deriv_ctx);
 

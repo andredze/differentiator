@@ -54,7 +54,7 @@ int main()
         if (MathCtxCtor(&taylor_math_ctx, 0))
             break;
 
-        if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, "x", 7, 0.0))
+        if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, "x", 3, 0.0))
             break;
 
     } while (0);

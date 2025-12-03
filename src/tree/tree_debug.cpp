@@ -42,18 +42,18 @@ static TreeErr_t TreeDumpSetDebugFilePaths()
     if (TreeDumpSetDirs())
         return TREE_FILE_ERROR;
 
-    DPRINTF("> creating TREE LOGS directories:\n"
-            "\tlog_dir: %s\n"
-            "\timg_dir: %s\n"
-            "\tdot_dir: %s\n",
-            debug.log_dir,
-            debug.img_dir,
-            debug.dot_dir);
+    // DPRINTF("> creating TREE LOGS directories:\n"
+    //         "\tlog_dir: %s\n"
+    //         "\timg_dir: %s\n"
+    //         "\tdot_dir: %s\n",
+    //         debug.log_dir,
+    //         debug.img_dir,
+    //         debug.dot_dir);
 
     if (TreeDumpMakeDirs())
         return TREE_FILE_ERROR;
 
-    DPRINTF("> TREE LOGS directories successfully created!\n");
+    // DPRINTF("> TREE LOGS directories successfully created!\n");
 
     if (TreeDumpSetLogFilePath())
         return TREE_FILE_ERROR;
@@ -419,14 +419,14 @@ void SetGraphFilepaths()
              sizeof(debug.graph_file_name),
              "graph_%04d",
              debug.graphs_count);
-    DPRINTF("debug.graph_file_name = %s;\n", debug.graph_file_name);
+    // DPRINTF("debug.graph_file_name = %s;\n", debug.graph_file_name);
 
     snprintf(debug.dot_file_path,
              sizeof(debug.dot_file_path),
              "%s/%s.dot",
              debug.dot_dir,
              debug.graph_file_name);
-    DPRINTF("debug.dot_file_path = %s;\n", debug.dot_file_path);
+    // DPRINTF("debug.dot_file_path = %s;\n", debug.dot_file_path);
 
     snprintf(debug.img_file_path,
              sizeof(debug.img_file_path),
@@ -434,7 +434,7 @@ void SetGraphFilepaths()
              debug.img_dir,
              debug.graph_file_name,
              IMAGE_FILE_TYPE);
-    DPRINTF("debug.img_file_path = %s;\n", debug.img_file_path);
+    // DPRINTF("debug.img_file_path = %s;\n", debug.img_file_path);
 }
 
 //------------------------------------------------------------------------------------------
@@ -472,7 +472,7 @@ TreeErr_t TreeConvertGraphFile()
 
     if (result == 0)
     {
-        DPRINTF("Generated graph dump: %s\n", debug.img_file_path);
+        // DPRINTF("Generated graph dump: %s\n", debug.img_file_path);
     }
     else
     {

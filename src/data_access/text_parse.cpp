@@ -1,5 +1,7 @@
 #include "text_parse.h"
 
+// TODO: log()
+
 /* ==================== Domain Specific Language for reading data ========================== */
 
 // lnode means left_node

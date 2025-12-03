@@ -7,7 +7,6 @@ static MathErr_t MathEvalNode              (MathCtx_t* math_ctx, TreeNode_t* nod
 static MathErr_t MathEvalNodeOpCase        (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
 static MathErr_t MathEvalNodeUnaryOpCase   (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
 static MathErr_t MathEvalNodeBinaryOpCase  (MathCtx_t* math_ctx, TreeNode_t* node, double* result);
-static MathErr_t MathExecuteUnaryOperation (MathOp_t operation,  double argument,  double* result);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -182,48 +181,37 @@ static MathErr_t MathEvalNodeBinaryOpCase(MathCtx_t* math_ctx, TreeNode_t* node,
             return error;
     }
 
-    // TODO: tex dump с подстановкой значений
-    // MathCtxTexDump(math_ctx, "evaluated binary op at %p", node);
-
     return MathExecuteBinaryOperation(node->data.value.op, left_result, right_result, result);
 }
 
 //------------------------------------------------------------------------------------------
 
 MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
-                                     double  left_result,
-                                     double  right_result,
-                                     double* result)
+                                     double   left_result,
+                                     double   right_result,
+                                     double*  result)
 {
     assert(result != NULL);
 
     switch (operation)
     {
-        case OP_ADD:
-            *result = left_result + right_result;
-            break;
-
-        case OP_SUB:
-            *result = left_result - right_result;
-            break;
-
-        case OP_MUL:
-            *result = left_result * right_result;
-            break;
-
-        case OP_DIV:
-            *result = left_result / right_result;
-            break;
+        case OP_ADD: *result = left_result + right_result; break;
+        case OP_SUB: *result = left_result - right_result; break;
+        case OP_MUL: *result = left_result * right_result; break;
+        case OP_DIV: *result = left_result / right_result; break;
 
         case OP_DEG:
             *result = pow(left_result, right_result);
             break;
 
-        case OP_SIN:
-        case OP_COS:
-        case OP_TG:
-        case OP_CTG:
-        case OP_LN:
+        case OP_LOG:
+            *result = log(right_result) / log(left_result);
+            break;
+
+        case OP_SIN:  case OP_COS:  case OP_TG:  case OP_CTG:
+        case OP_SH:   case OP_CH:   case OP_TH:  case OP_CTH:
+        case OP_ASIN: case OP_ACOS: case OP_ATG: case OP_ACTG:
+        case OP_LN:   case OP_EXP:  case OP_SQRT:
             PRINTERR("Given operation is unary");
             return MATH_UNKNOWN_OP;
 
@@ -238,39 +226,35 @@ MathErr_t MathExecuteBinaryOperation(MathOp_t operation,
 
 //------------------------------------------------------------------------------------------
 
-static MathErr_t MathExecuteUnaryOperation(MathOp_t operation,
-                                           double  argument,
-                                           double* result)
+MathErr_t MathExecuteUnaryOperation(MathOp_t operation,
+                                    double  argument,
+                                    double* result)
 {
     assert(result != NULL);
 
     switch (operation)
     {
-        case OP_SIN:
-            *result = sin(argument);
-            break;
+        case OP_LN:   *result = log(argument);                  break;
+        case OP_EXP:  *result = exp(argument);                  break;
+        case OP_SQRT: *result = sqrt(argument);                 break;
 
-        case OP_COS:
-            *result = cos(argument);
-            break;
+        case OP_SIN:  *result = sin(argument);                  break;
+        case OP_COS:  *result = cos(argument);                  break;
+        case OP_TG:   *result = tan(argument);                  break;
+        case OP_CTG:  *result = 1 / tan(argument);              break;
 
-        case OP_TG:
-            *result = tan(argument);
-            break;
+        case OP_SH:   *result = sinh(argument);                 break;
+        case OP_CH:   *result = cosh(argument);                 break;
+        case OP_TH:   *result = tanh(argument);                 break;
+        case OP_CTH:  *result = 1 / tanh(argument);             break;
 
-        case OP_CTG:
-            *result = 1 / tan(argument);
-            break;
+        case OP_ASIN: *result = asin(argument);                 break;
+        case OP_ACOS: *result = acos(argument);                 break;
+        case OP_ATG:  *result = atan(argument);                 break;
+        case OP_ACTG: *result = PI_NUMBER / 2 - atan(argument); break;
 
-        case OP_LN:
-            *result = log(argument);
-            break;
-
-        case OP_ADD:
-        case OP_SUB:
-        case OP_MUL:
-        case OP_DIV:
-        case OP_DEG:
+        case OP_ADD: case OP_SUB: case OP_MUL: case OP_DIV:
+        case OP_DEG: case OP_LOG:
             PRINTERR("Given operation is binary");
             return MATH_UNKNOWN_OP;
 

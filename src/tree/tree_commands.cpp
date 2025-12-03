@@ -260,7 +260,7 @@ TreeErr_t TreeSingleNodeDtor(TreeNode_t* node, Tree_t* tree)
     node->right  = NULL;
     node->parent = NULL;
 
-    cprintf(BLUE, "\t\tfreed ptr %p\n", node);
+    // cprintf(BLUE, "\t\tfreed ptr %p\n", node);
 
     free(node);
 

@@ -8,6 +8,7 @@
 #include "tree_commands.h"
 #include "funcs.h"
 #include <stdarg.h>
+#include <math.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -23,6 +24,7 @@ void      MathTexDumpSubtree        (TreeNode_t* node, MathCtx_t* math_ctx);
 void      MathTexDumpDiffSubtree    (TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx);
 void      MathTexDumpTaylor         (MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree);
 MathErr_t MathTexGraphic            (MathCtx_t* math_ctx, TreeNode_t* node, const char* file_name);
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 const char TEX_FILE_NAME[] = "math_log.tex";

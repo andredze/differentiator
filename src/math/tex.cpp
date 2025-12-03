@@ -1,5 +1,7 @@
 #include "tex.h"
 
+// TODO: make priority function и сравнение
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 static void TexDumpTitle    ();
@@ -8,7 +10,7 @@ static void TexConvertToPdf ();
 
 static void MathTexDumpNode             (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpNodeInorder      (TreeNode_t* node, MathCtx_t* math_ctx);
-static void MathTexDumpNodeDivCase      (TreeNode_t* node, MathCtx_t* math_ctx);
+static void MathTexDumpNodePreorderCase (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpUnaryOp          (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpData             (MathData_t  data, MathCtx_t* math_ctx);
 static void MathTexDumpBracketIfNeeded  (TreeNode_t* node, char bracket);
@@ -303,8 +305,9 @@ static void MathTexDumpNode(TreeNode_t* node, MathCtx_t* math_ctx)
         return;
     }
 
-    if (MathNodeMatchesOp(node, OP_DIV))
-        MathTexDumpNodeDivCase(node, math_ctx);
+    if (MathNodeMatchesOp(node, OP_DIV) ||
+        MathNodeMatchesOp(node, OP_LOG))
+        MathTexDumpNodePreorderCase(node, math_ctx);
     else
         MathTexDumpNodeInorder(node, math_ctx);
 }
@@ -318,9 +321,9 @@ static int MathNodeMatchesOp(TreeNode_t* node, MathOp_t op)
 
 //------------------------------------------------------------------------------------------
 
-static void MathTexDumpNodeDivCase(TreeNode_t* node, MathCtx_t* math_ctx)
+static void MathTexDumpNodePreorderCase(TreeNode_t* node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, " \\frac{ ");
+    fprintf(fp, " %s{ ", OP_CASES_TABLE[node->data.value.op].tex_str);
 
     if (node->left != NULL)
         MathTexDumpNode(node->left, math_ctx);
@@ -358,18 +361,21 @@ static void MathTexDumpNodeInorder(TreeNode_t* node, MathCtx_t* math_ctx)
 
 static void MathTexDumpBracketIfNeeded(TreeNode_t* node, char bracket)
 {
-    if (node->parent == NULL)
+    if (node->parent            == NULL    ||
+        node->data.type         != TYPE_OP ||
+        node->parent->data.type != TYPE_OP)
         return;
 
-    if (node->parent->data.value.op != OP_MUL &&
-        node->parent->data.value.op != OP_DIV)
-        return;
+    if ((node->data.value.op         == OP_ADD ||
+         node->data.value.op         == OP_SUB) &&
+        (node->parent->data.value.op == OP_MUL ||
+         node->parent->data.value.op == OP_DIV ||
+         node->parent->data.value.op == OP_DEG))
+        fprintf(fp, " %c ", bracket);
 
-    if (node->data.type != TYPE_OP)
-        return;
-
-    if (node->data.value.op == OP_ADD ||
-        node->data.value.op == OP_SUB)
+    if ((node->data.value.op         == OP_MUL ||
+         node->data.value.op         == OP_DIV) &&
+        (node->parent->data.value.op == OP_DEG))
         fprintf(fp, " %c ", bracket);
 }
 
@@ -422,17 +428,20 @@ static void MathTexDumpUnaryOp(TreeNode_t* node, MathCtx_t* math_ctx)
     assert(math_ctx != NULL);
     assert(node     != NULL);
 
-    fprintf(fp, "%s(", OP_CASES_TABLE[node->data.value.op].str);
+    fprintf(fp, "%s{(", OP_CASES_TABLE[node->data.value.op].tex_str);
 
     MathTexDumpNode(node->right, math_ctx);
 
-    fprintf(fp, ")");
+    fprintf(fp, ")}");
 }
 
 //------------------------------------------------------------------------------------------
 
 static void MathTexDumpNumber(double num)
 {
+    if (isnan(num))
+        fprintf(fp, " nan ");
+
     if (CompareDoubles(num, EULER_NUMBER) == 0)
     {
         fprintf(fp, " e ");
