@@ -172,6 +172,24 @@ void MathTexEval(MathCtx_t* math_ctx, double result)
 
 //------------------------------------------------------------------------------------------
 
+void MathTexDumpTaylor(MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree)
+{
+    assert(math_ctx != NULL);
+    assert(diff_degree > 0);
+
+    fprintf(fp, "\\[");
+    fprintf(fp, "f(x) = ");
+
+    MathTexDumpNode(node, math_ctx);
+
+    fprintf(fp, " + o(x ^ %d)", diff_degree);
+    fprintf(fp, "\\]\n");
+
+    fflush(fp);
+}
+
+//------------------------------------------------------------------------------------------
+
 static void MathTexVariables(MathCtx_t* math_ctx)
 {
     if (math_ctx->vars.size > 0)
