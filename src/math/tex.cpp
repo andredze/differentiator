@@ -7,6 +7,8 @@
 static void TexDumpTitle    ();
 static void TexDumpEnding   ();
 static void TexConvertToPdf ();
+static void TexOpenFormula ();
+static void TexCloseFormula();
 
 static void MathTexDumpNode             (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpNodeInorder      (TreeNode_t* node, MathCtx_t* math_ctx);
@@ -24,6 +26,20 @@ static void MathTexVariables            (MathCtx_t* math_ctx);
 static FILE* fp = NULL;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
+
+void TexOpenFormula()
+{
+    fprintf(fp, "\\begin{dmath*}\n");
+}
+
+//------------------------------------------------------------------------------------------
+
+void TexCloseFormula()
+{
+    fprintf(fp, "\\end{dmath*}\n");
+}
+
+//------------------------------------------------------------------------------------------
 
 void MathTexMessage(const char* fmt, ...)
 {
@@ -124,11 +140,11 @@ MathErr_t vMathCtxTexDump(MathCtx_t* math_ctx, const char* fmt, va_list args)
 
 void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, "\\[");
+    TexOpenFormula();
 
     MathTexDumpNode(node, math_ctx);
 
-    fprintf(fp, "\\]\n");
+    TexCloseFormula();
 
     fflush(fp);
 }
@@ -137,7 +153,7 @@ void MathTexDumpSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
 
 void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, "\\[");
+    TexOpenFormula();
     fprintf(fp, R"(\frac{d}{d%s})""(", math_ctx->vars.data[0].str);
 
     // TODO: как не терять переменные??? нужно передавать еще и src_mathctx????
@@ -148,14 +164,15 @@ void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* 
 
     MathTexDumpNode(diff_node, math_ctx);
 
-    fprintf(fp, "\\]\n");
+    TexCloseFormula();
 }
 
 //------------------------------------------------------------------------------------------
 
 void MathTexEval(MathCtx_t* math_ctx, double result)
 {
-    fprintf(fp, "\\[f(");
+    TexOpenFormula();
+    fprintf(fp, "f(");
 
     MathTexVariables(math_ctx);
 
@@ -167,7 +184,8 @@ void MathTexEval(MathCtx_t* math_ctx, double result)
 
     math_ctx->dump_values = 0;
 
-    fprintf(fp, " = %lg\\]\n", result);
+    fprintf(fp, " = %lg", result);
+    TexCloseFormula();
 
     fflush(fp);
 }
@@ -179,13 +197,13 @@ void MathTexDumpTaylor(MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree)
     assert(math_ctx != NULL);
     assert(diff_degree > 0);
 
-    fprintf(fp, "\\[");
+    TexOpenFormula();
     fprintf(fp, "f(x) = ");
 
     MathTexDumpNode(node, math_ctx);
 
     fprintf(fp, " + o(x ^ %d)", diff_degree);
-    fprintf(fp, "\\]\n");
+    TexCloseFormula();
 
     fflush(fp);
 }
@@ -247,6 +265,9 @@ R"(\documentclass[12pt, a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[T2A]{fontenc}
 \usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{breqn}
+\allowdisplaybreaks
 
 \title{ААААААААА БЛЯ (МАТАН)}
 \author{Киселев Андрей}
