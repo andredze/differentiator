@@ -112,6 +112,7 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
 {
     assert(dest_math_ctx != NULL);
     assert(src_math_ctx  != NULL);
+    assert(str_var       != NULL);
 
     DEBUG_TREE_CHECK(src_math_ctx, "MATH_DIFF");
     MathTexSection("Дифференцирование");

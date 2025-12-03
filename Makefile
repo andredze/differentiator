@@ -29,6 +29,7 @@ SOURCES = src/main.cpp 						\
 		  src/math/diff.cpp					\
 		  src/math/tex.cpp					\
 		  src/math/simplify.cpp				\
+		  src/math/taylor.cpp				\
 		  src/data_access/text_parse.cpp
 
 ifdef DEBUG

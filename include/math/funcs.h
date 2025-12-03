@@ -4,8 +4,22 @@
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "tree_commands.h"
+#include "tree_debug.h"
 #include "math_types.h"
 #include "tex.h"
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+#ifdef TREE_DEBUG
+    #define MATH_VARS_DUMP(math_ctx, fmt, ...)                      \
+            BEGIN                                                   \
+            MathVarsTableDump((math_ctx), (fmt), ##__VA_ARGS__);    \
+            END
+
+#else
+    #define MATH_VARS_DUMP(math_ctx, fmt, ...) ;
+
+#endif
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

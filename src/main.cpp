@@ -5,13 +5,15 @@
 #include "eval.h"
 #include "diff.h"
 #include "simplify.h"
+#include "taylor.h"
 
 //------------------------------------------------------------------------------------------
 
 int main()
 {
-    MathCtx_t math_ctx = {};
-    MathCtx_t diff_math_ctx = {};
+    MathCtx_t math_ctx        = {};
+    MathCtx_t diff_math_ctx   = {};
+    MathCtx_t taylor_math_ctx = {};
 
     TreeOpenLogFile();
     MathOpenTexFile();
@@ -46,8 +48,18 @@ int main()
 
         if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))
             break;
+
+        MathTexChapter("Разложение в ряд Тейлора");
+
+        if (MathCtxCtor(&taylor_math_ctx, 0))
+            break;
+
+        if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, "x", 3, 0.0))
+            break;
+
     } while (0);
 
+    MathCtxDtor(&taylor_math_ctx);
     MathCtxDtor(&diff_math_ctx);
     MathCtxDtor(&math_ctx);
 

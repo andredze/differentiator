@@ -1,22 +1,23 @@
-#ifndef MATH_EVAL_H
-#define MATH_EVAL_H
+#ifndef MATH_PLOT_H
+#define MATH_PLOT_H
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #include "math_types.h"
+#include "tree_types.h"
+#include "tree_commands.h"
 #include "funcs.h"
-#include "tex.h"
-#include <math.h>
+#include <stdarg.h>
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathEvaluate (MathCtx_t* math_ctx, double* presult);
-
-MathErr_t MathEvaluateWSetValues    (MathCtx_t* math_ctx, double* presult);
-
-MathErr_t MathExecuteBinaryOperation(MathOp_t operation, double  left_result,
-                                     double  right_result, double* result);
+MathErr_t MathOpenPlotFile           ();
+MathErr_t MathClosePlotFile          ();
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#endif /* MATH_EVAL_H */
+const char PLOT_FILE_NAME[] = "math_plot.txt";
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+#endif /* MATH_PLOT_H */

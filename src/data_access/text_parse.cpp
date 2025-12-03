@@ -26,13 +26,9 @@
             BEGIN                                                                                      \
             TreeReadBufferDump((expr->buffer), (expr->cur_p - expr->buffer), (fmt), ##__VA_ARGS__);    \
             END
-    #define MATH_VARS_DUMP(math_ctx, fmt, ...)                      \
-            BEGIN                                                   \
-            MathVarsTableDump((math_ctx), (fmt), ##__VA_ARGS__);    \
-            END
 #else
     #define TREE_READ_BUFFER_DUMP(expr, fmt, ...) ;
-    #define MATH_VARS_DUMP(math_ctx, fmt, ...)    ;
+
 #endif
 
 //------------------------------------------------------------------------------------------

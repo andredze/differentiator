@@ -430,3 +430,16 @@ static void MathTexDumpNumber(double num)
 }
 
 //------------------------------------------------------------------------------------------
+
+MathErr_t MathTexGraphic(MathCtx_t* math_ctx, TreeNode_t* node, const char* file_name)
+{
+    // MathPlotTree(math_ctx, node, file_name);
+
+    MathTexMessage("\\begin{center}\n"
+                   "\\includegraphics[scale=0.5]{%s}\n"
+                   "\\end{center}\n", file_name);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------

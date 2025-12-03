@@ -310,6 +310,58 @@ void TreeCloseLogFile()
 
 //------------------------------------------------------------------------------------------
 
+TreeErr_t TreeGraphDumpSubtree(MathCtx_t* math_ctx, TreeNode_t* node)
+{
+    assert(math_ctx != NULL);
+
+    Tree_t*   tree  = &math_ctx->tree;
+    TreeErr_t error = TREE_SUCCESS;
+
+    if (tree == NULL)
+    {
+        PRINTERR("TREE_NULL");
+        return    TREE_NULL;
+    }
+
+    SetGraphFilepaths();
+
+    FILE* dot_file = fopen(debug.dot_file_path, "w");
+
+    debug.graphs_count++;
+
+    if (dot_file == NULL)
+    {
+        PRINTERR("Failed opening logfile");
+        return TREE_DUMP_ERROR;
+    }
+
+    DumpGraphTitle(dot_file);
+
+    if (DumpTreeEdges(node, dot_file))
+        return TREE_DUMP_ERROR;
+
+    if ((error = TreeNodeDump(node, dot_file, math_ctx)))
+        return error;
+
+    fprintf(dot_file, "}\n");
+
+    fclose(dot_file);
+
+    if ((error = TreeConvertGraphFile()))
+        return error;
+
+    int image_width = tree->size <= 5 ? 25 : 50;
+
+    fprintf(debug.fp, "\n<img src = svg/%s.svg width = %d%%>\n\n"
+                      "============================================================="
+                      "=============================================================\n\n",
+                       debug.graph_file_name, image_width);
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
 TreeErr_t TreeGraphDump(MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);

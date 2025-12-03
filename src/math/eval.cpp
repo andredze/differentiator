@@ -38,6 +38,27 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
 
 //------------------------------------------------------------------------------------------
 
+MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult)
+{
+    assert(math_ctx != NULL);
+    assert(presult  != NULL);
+
+    double result = 0.0;
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if ((error = MathEvalNode(math_ctx, math_ctx->tree.dummy->right, &result)))
+        return error;
+
+    *presult = result;
+
+    MathTexEval(math_ctx, *presult);
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
 static MathErr_t MathGetVarValues(MathCtx_t* math_ctx)
 {
     assert(math_ctx != NULL);

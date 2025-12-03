@@ -28,7 +28,11 @@ typedef struct MathContext
 {
     Tree_t tree;
     Vars_t vars;
-    int dump_values;
+    int    dump_values;
+
+    char   plot_file_name[MAX_FILE_NAME_LEN];
+    FILE*  plot_fp;
+
 } MathCtx_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
