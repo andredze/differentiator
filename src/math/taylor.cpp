@@ -17,7 +17,7 @@
 static int         GetFactorial               (int value);
 static MathErr_t   MathTaylorGetFirstElem     (SeriesCtx_t* series_ctx);
 static MathErr_t   MathTaylorGetOneElem       (SeriesCtx_t* series_ctx);
-static TreeNode_t* MathTaylorAddElemToTree    (SeriesCtx_t* series_ctx);
+static TreeNode_t* MathTaylorAddElemToTree    (SeriesCtx_t* series_ctx, int tex_dump);
 
 //------------------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ MathErr_t MathGetTaylorSeries(MathCtx_t*    math_ctx, MathCtx_t* taylor_ctx,
     taylor_ctx->tree.dummy->right = series_ctx.node;
     series_ctx.node->parent = taylor_ctx->tree.dummy;
 
-    if (((error = MathSimplify(taylor_ctx))))
+    if (((error = MathSimplify(taylor_ctx, 1))))
         return error;
 
     TREE_CALL_DUMP(taylor_ctx, "TAYLOR SERIES TREE");
@@ -123,15 +123,22 @@ static MathErr_t MathTaylorGetOneElem(SeriesCtx_t* series_ctx)
     TREE_CALL_DUMP(curr_deriv_ctx, "TAYLOR SERIES: %d CURR DERIV TREE", diff_degree);
     MATH_VARS_DUMP(curr_deriv_ctx, "TAYLOR SERIES: %d CURR DERIV TREE", diff_degree);
 
-    if ((error = MathDifferentiate(prev_deriv_ctx, curr_deriv_ctx, series_ctx->params->diff_var)))
+    int tex_dump = 0;
+
+    if (diff_degree > 3)
+        tex_dump = 0;
+    else
+        tex_dump = 1;
+
+    if ((error = MathDifferentiate(prev_deriv_ctx, curr_deriv_ctx, series_ctx->params->diff_var, tex_dump)))
         return error;
 
-    if ((error = MathSimplify(curr_deriv_ctx)))
+    if ((error = MathSimplify(curr_deriv_ctx, tex_dump)))
         return error;
 
     MathCtxDtor(prev_deriv_ctx);
 
-    series_ctx->node = ADD_(series_ctx->node, MathTaylorAddElemToTree(series_ctx));
+    series_ctx->node = ADD_(series_ctx->node, MathTaylorAddElemToTree(series_ctx, tex_dump));
 
     // MathTexDumpSubtree(series_ctx->node, taylor_ctx);
 
@@ -163,7 +170,7 @@ static int GetFactorial(int value)
 
 //------------------------------------------------------------------------------------------
 
-static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx)
+static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx, int tex_dump)
 {
     assert(series_ctx != NULL);
 
@@ -172,7 +179,7 @@ static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx)
     if (MathVarSetValue(series_ctx->curr_deriv_ctx, series_ctx->params->taylor_point, 0))
         return NULL;
 
-    if (MathEvaluateWSetValues(series_ctx->curr_deriv_ctx, &value_in_point, 1))
+    if (MathEvaluateWSetValues(series_ctx->curr_deriv_ctx, &value_in_point, tex_dump))
         return NULL;
 
     int fact_res = GetFactorial(series_ctx->diff_degree);
@@ -188,6 +195,7 @@ static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx)
                             DEG_(SUB_(VAR_(0), NUM_(series_ctx->params->taylor_point)),
                                  NUM_(series_ctx->diff_degree)));
 
+    MathTexSection("%d член разложения в ряд", series_ctx->diff_degree + 1);
     MathTexDumpSubtree(node, series_ctx->taylor_ctx);
 
     return node;

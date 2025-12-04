@@ -27,12 +27,20 @@ static MathErr_t MathConvoluteSingleNodeUnaryOp  (TreeNode_t* node, MathCtx_t* m
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathSimplify(MathCtx_t* math_ctx)
-{
-    MathTexSection("Упрощение выражения");
-    MathTexMessage("Путем несложных преобразований");
+static int gl_tex_dump = 0;
 
-    MathCtxTexDump(math_ctx, NULL);
+//------------------------------------------------------------------------------------------
+
+MathErr_t MathSimplify(MathCtx_t* math_ctx, int tex_dump)
+{
+    gl_tex_dump = tex_dump;
+
+    if (tex_dump)
+    {
+        MathTexSection("Упрощение выражения");
+        MathTexMessage("Путем несложных преобразований");
+        MathCtxTexDump(math_ctx, NULL);
+    }
 
     size_t size_before = 0;
 
@@ -138,7 +146,10 @@ static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
     }
 
     if (size_before != math_ctx->tree.size)
-        MathCtxTexDump(math_ctx, NULL, node);
+    {
+        if (gl_tex_dump)
+            MathCtxTexDump(math_ctx, NULL, node);
+    }
 
     return MATH_SUCCESS;
 }
@@ -416,7 +427,8 @@ static MathErr_t MathConvoluteSingleNodeBinaryOp(TreeNode_t* node, MathCtx_t* ma
     node->data.type      = TYPE_NUM;
     node->data.value.num = result;
 
-    MathCtxTexDump(math_ctx, NULL, node);
+    if (gl_tex_dump)
+        MathCtxTexDump(math_ctx, NULL, node);
 
     return MATH_SUCCESS;
 }
@@ -445,7 +457,8 @@ static MathErr_t MathConvoluteSingleNodeUnaryOp(TreeNode_t* node, MathCtx_t* mat
     node->data.type      = TYPE_NUM;
     node->data.value.num = result;
 
-    MathCtxTexDump(math_ctx, NULL, node);
+    if (gl_tex_dump)
+        MathCtxTexDump(math_ctx, NULL, node);
 
     return MATH_SUCCESS;
 }

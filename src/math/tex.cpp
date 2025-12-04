@@ -205,7 +205,7 @@ void MathTexDumpTaylor(MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree, d
     if (CompareDoubles(0.0, point) == 0)
         fprintf(fp, " + o(x ^ %d)", diff_degree);
     else
-        fprintf(fp, " + o((x - %lg) ^ %d)", point, diff_degree);
+        fprintf(fp, " + o((x - %lg) ^ {%d})", point, diff_degree);
 
     TexCloseFormula();
 
@@ -350,17 +350,17 @@ static int MathNodeMatchesOp(TreeNode_t* node, MathOp_t op)
 
 static void MathTexDumpNodePreorderCase(TreeNode_t* node, MathCtx_t* math_ctx)
 {
-    fprintf(fp, " %s{ ", OP_CASES_TABLE[node->data.value.op].tex_str);
+    fprintf(fp, " %s{", OP_CASES_TABLE[node->data.value.op].tex_str);
 
     if (node->left != NULL)
         MathTexDumpNode(node->left, math_ctx);
 
-    fprintf(fp, " }{ ");
+    fprintf(fp, "}{");
 
     if (node->right != NULL)
         MathTexDumpNode(node->right, math_ctx);
 
-    fprintf(fp, " } ");
+    fprintf(fp, "}");
 }
 
 //------------------------------------------------------------------------------------------
@@ -414,7 +414,7 @@ static void MathTexDumpBraceIfNeeded(TreeNode_t* node, char bracket)
         return;
 
     if (node->data.value.op == OP_DEG)
-        fprintf(fp, " %c ", bracket);
+        fprintf(fp, "%c", bracket);
 }
 
 //------------------------------------------------------------------------------------------
@@ -439,7 +439,7 @@ static void MathTexDumpData(MathData_t data, MathCtx_t* math_ctx)
                 fprintf(fp, " %s ", math_ctx->vars.data[data.value.var].str);
             }
             else
-                fprintf(fp, " %lg ", math_ctx->vars.data[data.value.var].value);
+                fprintf(fp, "%lg", math_ctx->vars.data[data.value.var].value);
             break;
 
         default:
@@ -475,11 +475,11 @@ static void MathTexDumpNumber(double num)
     }
     else if (CompareDoubles(num, PI_NUMBER) == 0)
     {
-        fprintf(fp, " \\pi  ");
+        fprintf(fp, " \\pi ");
     }
     else
     {
-        fprintf(fp, " %lg ", num);
+        fprintf(fp, "%lg", num);
     }
 }
 

@@ -30,7 +30,7 @@ int main()
         if (TreeReadInputData(&math_ctx, &params))
             break;
 
-        if (MathSimplify(&math_ctx))
+        if (MathSimplify(&math_ctx, 1))
             break;
 
         MathTexChapter("Первая производная");
@@ -38,10 +38,10 @@ int main()
         if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
-        if (MathDifferentiate(&math_ctx, &diff_math_ctx, params.diff_var))
+        if (MathDifferentiate(&math_ctx, &diff_math_ctx, params.diff_var, 1))
             break;
 
-        if (MathSimplify(&diff_math_ctx))
+        if (MathSimplify(&diff_math_ctx, 1))
             break;
 
         if (math_ctx.vars.size != 1)
