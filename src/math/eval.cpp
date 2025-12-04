@@ -37,7 +37,7 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult)
+MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult, int tex_dump)
 {
     assert(math_ctx != NULL);
     assert(presult  != NULL);
@@ -51,7 +51,8 @@ MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult)
 
     *presult = result;
 
-    MathTexEval(math_ctx, *presult);
+    if (tex_dump)
+        MathTexEval(math_ctx, *presult);
 
     return MATH_SUCCESS;
 }

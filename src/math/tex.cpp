@@ -267,6 +267,8 @@ R"(\documentclass[12pt, a4paper]{report}
 \usepackage[russian]{babel}
 \usepackage{amsmath}
 \usepackage{breqn}
+\usepackage{pdfpages}
+\usepackage{graphicx}
 \allowdisplaybreaks
 
 \title{ААААААААА БЛЯ (МАТАН)}
@@ -479,13 +481,33 @@ static void MathTexDumpNumber(double num)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathTexGraphic(MathCtx_t* math_ctx, TreeNode_t* node, const char* file_name)
+MathErr_t MathTexGraphic(MathCtx_t* math_ctx,        MathCtx_t*    diff_math_ctx,
+                         MathCtx_t* taylor_math_ctx, FuncParams_t* params)
 {
-    // MathPlotTree(math_ctx, node, file_name);
+    assert(taylor_math_ctx != NULL);
+    assert(diff_math_ctx   != NULL);
+    assert(math_ctx        != NULL);
+    assert(params          != NULL);
+
+    MathErr_t error = MATH_SUCCESS;
+
+    if ((error = MathPlotDumpPoints(math_ctx, params)))
+        return error;
+
+    if ((error = MathPlotDumpPoints(diff_math_ctx, params)))
+        return error;
+
+    if ((error = MathPlotDumpPoints(taylor_math_ctx, params)))
+        return error;
+
+    if ((error = MathPlotConvertGraphic(params)))
+        return error;
+
+    MathTexChapter("Графики");
 
     MathTexMessage("\\begin{center}\n"
-                   "\\includegraphics[scale=0.5]{%s}\n"
-                   "\\end{center}\n", file_name);
+                   "\\includegraphics[width=\\textwidth]{%s}\n"
+                   "\\end{center}\n", GRAPHIC_PDF_FILE_NAME);
 
     return MATH_SUCCESS;
 }

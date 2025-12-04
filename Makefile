@@ -30,6 +30,7 @@ SOURCES = src/main.cpp 						\
 		  src/math/tex.cpp					\
 		  src/math/simplify.cpp				\
 		  src/math/taylor.cpp				\
+		  src/math/plot.cpp					\
 		  src/data_access/text_parse.cpp
 
 ifdef DEBUG

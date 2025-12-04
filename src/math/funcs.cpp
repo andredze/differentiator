@@ -270,3 +270,23 @@ MathErr_t MathGetVarIndex(MathCtx_t* math_ctx, const char* str_var, size_t* var_
 }
 
 //------------------------------------------------------------------------------------------
+
+MathErr_t MathVarSetValue(MathCtx_t* math_ctx, double point, size_t var_index)
+{
+    assert(math_ctx != NULL);
+
+    DPRINTF("math_ctx->vars.size = %zu; var_index = %zu;\n",
+             math_ctx->vars.size, var_index);
+
+    if (math_ctx->vars.size <= var_index)
+    {
+        PRINTERR("Variable is not in table, math_ctx = %p; var_index = %zu;\n", math_ctx, var_index);
+        return MATH_INVALID_INPUT;
+    }
+
+    math_ctx->vars.data[var_index].value = point;
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------

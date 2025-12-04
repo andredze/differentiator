@@ -6,6 +6,7 @@
 #include "diff.h"
 #include "simplify.h"
 #include "taylor.h"
+#include "plot.h"
 
 //------------------------------------------------------------------------------------------
 
@@ -32,11 +33,6 @@ int main()
         if (MathSimplify(&math_ctx))
             break;
 
-        double result = 0;
-
-        if (MathEvaluate(&math_ctx, &result))
-            break;
-
         MathTexChapter("Первая производная");
 
         if (MathCtxCtor(&diff_math_ctx, 0))
@@ -48,9 +44,6 @@ int main()
         if (MathSimplify(&diff_math_ctx))
             break;
 
-        if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))
-            break;
-
         if (math_ctx.vars.size != 1)
             break;
 
@@ -60,6 +53,9 @@ int main()
             break;
 
         if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, &params))
+            break;
+
+        if (MathTexGraphic(&math_ctx, &diff_math_ctx, &taylor_math_ctx, &params))
             break;
 
     } while (0);

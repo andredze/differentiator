@@ -34,6 +34,7 @@ TreeNode_t* MathCopySubtree       (MathCtx_t* math_ctx, TreeNode_t* node, MathCt
 MathErr_t   MathAddVarToTable     (MathCtx_t* math_ctx, const char* var_str);
 int         MathVarInTable        (MathCtx_t* math_ctx, const char* var_str);
 MathErr_t   MathGetVarIndex       (MathCtx_t* math_ctx, const char* str_var, size_t* var_ind);
+MathErr_t   MathVarSetValue       (MathCtx_t* math_ctx, double point, size_t var_index);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

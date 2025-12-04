@@ -17,7 +17,6 @@ static int         GetFactorial               (int value);
 static MathErr_t   MathTaylorGetFirstElem     (SeriesCtx_t* series_ctx);
 static MathErr_t   MathTaylorGetOneElem       (SeriesCtx_t* series_ctx);
 static TreeNode_t* MathTaylorAddElemToTree    (SeriesCtx_t* series_ctx);
-static MathErr_t   MathTaylorSetValue         (MathCtx_t* math_ctx, double point, size_t var_index);
 
 //------------------------------------------------------------------------------------------
 
@@ -87,14 +86,14 @@ static MathErr_t MathTaylorGetFirstElem(SeriesCtx_t* series_ctx)
     if ((error = MathAddVarToTable(prev_deriv_ctx, params->diff_var)))
         return error;
 
-    if ((error = MathTaylorSetValue(prev_deriv_ctx, params->taylor_point, 0)))
+    if ((error = MathVarSetValue(prev_deriv_ctx, params->taylor_point, 0)))
         return error;
 
     TREE_CALL_DUMP(prev_deriv_ctx, "TAYLOR SERIES: ZERO DERIV TREE");
 
     double value_in_point = 0.0;
 
-    if ((error = MathEvaluateWSetValues(prev_deriv_ctx, &value_in_point)))
+    if ((error = MathEvaluateWSetValues(prev_deriv_ctx, &value_in_point, 1)))
         return error;
 
     series_ctx->node = NUM_(value_in_point);
@@ -143,26 +142,6 @@ static MathErr_t MathTaylorGetOneElem(SeriesCtx_t* series_ctx)
 
 //------------------------------------------------------------------------------------------
 
-static MathErr_t MathTaylorSetValue(MathCtx_t* math_ctx, double point, size_t var_index)
-{
-    assert(math_ctx != NULL);
-
-    DPRINTF("math_ctx->vars.size = %zu; var_index = %zu;\n",
-             math_ctx->vars.size, var_index);
-
-    if (math_ctx->vars.size <= var_index)
-    {
-        PRINTERR("Variable is not in table, math_ctx = %p; var_index = %zu;\n", math_ctx, var_index);
-        return MATH_INVALID_INPUT;
-    }
-
-    math_ctx->vars.data[var_index].value = point;
-
-    return MATH_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------
-
 static int GetFactorial(int value)
 {
     if (value > 256 || value < 0)
@@ -187,10 +166,10 @@ static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx)
 
     double value_in_point = 0.0;
 
-    if (MathTaylorSetValue(series_ctx->curr_deriv_ctx, series_ctx->params->taylor_point, 0))
+    if (MathVarSetValue(series_ctx->curr_deriv_ctx, series_ctx->params->taylor_point, 0))
         return NULL;
 
-    if (MathEvaluateWSetValues(series_ctx->curr_deriv_ctx, &value_in_point))
+    if (MathEvaluateWSetValues(series_ctx->curr_deriv_ctx, &value_in_point, 1))
         return NULL;
 
     int fact_res = GetFactorial(series_ctx->diff_degree);

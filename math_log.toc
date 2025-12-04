@@ -2,7 +2,6 @@
 \contentsline {chapter}{\numberline {1}Обычная функция}{2}{}%
 \contentsline {section}{\numberline {1.1}Исходное выражение}{2}{}%
 \contentsline {section}{\numberline {1.2}Упрощение выражения}{2}{}%
-\contentsline {section}{\numberline {1.3}Вычисление значений}{2}{}%
 \contentsline {chapter}{\numberline {2}Первая производная}{3}{}%
 \contentsline {section}{\numberline {2.1}Дифференцирование}{3}{}%
 \contentsline {section}{\numberline {2.2}Упрощение выражения}{3}{}%
@@ -14,3 +13,4 @@
 \contentsline {section}{\numberline {3.5}Дифференцирование}{5}{}%
 \contentsline {section}{\numberline {3.6}Упрощение выражения}{6}{}%
 \contentsline {section}{\numberline {3.7}Упрощение выражения}{6}{}%
+\contentsline {chapter}{\numberline {4}Графики}{7}{}%
