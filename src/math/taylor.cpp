@@ -58,7 +58,8 @@ MathErr_t MathGetTaylorSeries(MathCtx_t*    math_ctx, MathCtx_t* taylor_ctx,
 
     TREE_CALL_DUMP(taylor_ctx, "TAYLOR SERIES TREE");
 
-    MathTexMessage("Итоговое разложение в ряд Тейлора");
+    MathTexSection("Итоговое разложение в ряд Тейлора");
+    MathTexMessage("Разложение в окрестности %lg до %d степени", params->taylor_point, params->taylor_degree);
     MathTexDumpTaylor(taylor_ctx, taylor_ctx->tree.dummy->right, last_diff_degree);
 
     MathCtxDtor(series_ctx.curr_deriv_ctx);
@@ -131,8 +132,9 @@ static MathErr_t MathTaylorGetOneElem(SeriesCtx_t* series_ctx)
 
     series_ctx->node = ADD_(series_ctx->node, MathTaylorAddElemToTree(series_ctx));
 
-    MathTexDumpSubtree(series_ctx->node, taylor_ctx);
+    // MathTexDumpSubtree(series_ctx->node, taylor_ctx);
 
+    MathTexSection("Разложение в ряд Тейлора до %d степени", diff_degree);
     MathTexDumpTaylor(taylor_ctx, series_ctx->node, diff_degree);
 
     *series_ctx->prev_deriv_ctx = *curr_deriv_ctx;

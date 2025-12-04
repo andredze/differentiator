@@ -4,13 +4,17 @@
 \contentsline {section}{\numberline {1.2}Упрощение выражения}{2}{}%
 \contentsline {chapter}{\numberline {2}Первая производная}{3}{}%
 \contentsline {section}{\numberline {2.1}Дифференцирование}{3}{}%
-\contentsline {section}{\numberline {2.2}Упрощение выражения}{3}{}%
-\contentsline {chapter}{\numberline {3}Разложение в ряд Тейлора}{4}{}%
-\contentsline {section}{\numberline {3.1}Дифференцирование}{4}{}%
-\contentsline {section}{\numberline {3.2}Упрощение выражения}{4}{}%
-\contentsline {section}{\numberline {3.3}Дифференцирование}{5}{}%
-\contentsline {section}{\numberline {3.4}Упрощение выражения}{5}{}%
-\contentsline {section}{\numberline {3.5}Дифференцирование}{5}{}%
-\contentsline {section}{\numberline {3.6}Упрощение выражения}{6}{}%
-\contentsline {section}{\numberline {3.7}Упрощение выражения}{6}{}%
-\contentsline {chapter}{\numberline {4}Графики}{7}{}%
+\contentsline {section}{\numberline {2.2}Упрощение выражения}{4}{}%
+\contentsline {chapter}{\numberline {3}Разложение в ряд Тейлора}{6}{}%
+\contentsline {section}{\numberline {3.1}Дифференцирование}{6}{}%
+\contentsline {section}{\numberline {3.2}Упрощение выражения}{7}{}%
+\contentsline {section}{\numberline {3.3}Разложение в ряд Тейлора до 1 степени}{8}{}%
+\contentsline {section}{\numberline {3.4}Дифференцирование}{9}{}%
+\contentsline {section}{\numberline {3.5}Упрощение выражения}{12}{}%
+\contentsline {section}{\numberline {3.6}Разложение в ряд Тейлора до 2 степени}{17}{}%
+\contentsline {section}{\numberline {3.7}Дифференцирование}{17}{}%
+\contentsline {section}{\numberline {3.8}Упрощение выражения}{27}{}%
+\contentsline {section}{\numberline {3.9}Разложение в ряд Тейлора до 3 степени}{58}{}%
+\contentsline {section}{\numberline {3.10}Упрощение выражения}{58}{}%
+\contentsline {section}{\numberline {3.11}Итоговое разложение в ряд Тейлора}{58}{}%
+\contentsline {chapter}{\numberline {4}Графики}{59}{}%
