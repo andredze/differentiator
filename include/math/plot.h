@@ -20,7 +20,7 @@ MathErr_t MathPlotConvertGraphic    (FuncParams_t* params);
 const char* const PLOT_SCRIPT_FILE_NAME = "plot_script.txt";
 const char* const GRAPHIC_PDF_FILE_NAME = "graphics.pdf";
 const char* const GRAPHIC_FILE_NAME     = "graphic.txt";
-const double      PLOT_X_INCREMENT      = 0.001;
+const double      PLOT_X_INCREMENT      = 0.0005;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

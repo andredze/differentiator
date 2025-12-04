@@ -90,12 +90,13 @@ static MathErr_t MathPlotMakeScript(FuncParams_t* params)
     }
 
     fprintf(fp,
-R"(set terminal pdf
+R"(set terminal pdf size 15cm, 15cm
 set output "graphics.pdf"
 set title "График анализа функции"
 set xlabel "X"
 set ylabel "Y"
 set grid
+set size square
 set xrange [%lg:%lg]
 set yrange [%lg:%lg]
 set key opaque
