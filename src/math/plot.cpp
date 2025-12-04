@@ -7,7 +7,7 @@ static int graphs_count = 0;
 //------------------------------------------------------------------------------------------
 
 static MathErr_t MathPlotMakeScript(FuncParams_t* params);
-static void      MathPlotRunScript();
+static void      MathPlotRunScript ();
 
 //------------------------------------------------------------------------------------------
 

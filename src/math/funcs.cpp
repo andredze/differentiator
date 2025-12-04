@@ -2,10 +2,10 @@
 
 //------------------------------------------------------------------------------------------
 
-static MathErr_t MathCopyNodeAddVarToTable(MathCtx_t* math_ctx, TreeNode_t* node,
-                                           MathCtx_t* src_math_ctx);
+static MathErr_t MathCopyNodeAddVarToTable  (MathCtx_t* math_ctx, TreeNode_t* node,
+                                             MathCtx_t* src_math_ctx);
 
-static MathErr_t MathPutDataInVarTable  (MathCtx_t* math_ctx, const char* var_str);
+static MathErr_t MathPutDataInVarTable      (MathCtx_t* math_ctx, const char* var_str);
 
 //------------------------------------------------------------------------------------------
 
