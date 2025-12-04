@@ -192,7 +192,7 @@ void MathTexEval(MathCtx_t* math_ctx, double result)
 
 //------------------------------------------------------------------------------------------
 
-void MathTexDumpTaylor(MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree)
+void MathTexDumpTaylor(MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree, double point)
 {
     assert(math_ctx != NULL);
     assert(diff_degree > 0);
@@ -202,7 +202,11 @@ void MathTexDumpTaylor(MathCtx_t* math_ctx, TreeNode_t* node, int diff_degree)
 
     MathTexDumpNode(node, math_ctx);
 
-    fprintf(fp, " + o(x ^ %d)", diff_degree);
+    if (CompareDoubles(0.0, point) == 0)
+        fprintf(fp, " + o(x ^ %d)", diff_degree);
+    else
+        fprintf(fp, " + o((x - %lg) ^ %d)", point, diff_degree);
+
     TexCloseFormula();
 
     fflush(fp);

@@ -7,6 +7,7 @@
 #define VAR_(var_index)    MathNodeCtor(taylor_ctx, {TYPE_VAR, { .var = var_index }}, NULL, NULL)
 
 #define ADD_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_ADD }}, (lnode), (rnode))
+#define SUB_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_SUB }}, (lnode), (rnode))
 #define MUL_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_MUL }}, (lnode), (rnode))
 #define DIV_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_DIV }}, (lnode), (rnode))
 #define DEG_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_DEG }}, (lnode), (rnode))
@@ -60,7 +61,7 @@ MathErr_t MathGetTaylorSeries(MathCtx_t*    math_ctx, MathCtx_t* taylor_ctx,
 
     MathTexSection("Итоговое разложение в ряд Тейлора");
     MathTexMessage("Разложение в окрестности %lg до %d степени", params->taylor_point, params->taylor_degree);
-    MathTexDumpTaylor(taylor_ctx, taylor_ctx->tree.dummy->right, last_diff_degree);
+    MathTexDumpTaylor(taylor_ctx, taylor_ctx->tree.dummy->right, last_diff_degree, params->taylor_point);
 
     MathCtxDtor(series_ctx.curr_deriv_ctx);
 
@@ -135,7 +136,7 @@ static MathErr_t MathTaylorGetOneElem(SeriesCtx_t* series_ctx)
     // MathTexDumpSubtree(series_ctx->node, taylor_ctx);
 
     MathTexSection("Разложение в ряд Тейлора до %d степени", diff_degree);
-    MathTexDumpTaylor(taylor_ctx, series_ctx->node, diff_degree);
+    MathTexDumpTaylor(taylor_ctx, series_ctx->node, diff_degree, series_ctx->params->taylor_point);
 
     *series_ctx->prev_deriv_ctx = *curr_deriv_ctx;
 
@@ -184,7 +185,8 @@ static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx)
     MathCtx_t* taylor_ctx = series_ctx->taylor_ctx;
 
     TreeNode_t* node = MUL_(NUM_(coeff),
-                            DEG_(VAR_(0), NUM_(series_ctx->diff_degree)));
+                            DEG_(SUB_(VAR_(0), NUM_(series_ctx->params->taylor_point)),
+                                 NUM_(series_ctx->diff_degree)));
 
     MathTexDumpSubtree(node, series_ctx->taylor_ctx);
 

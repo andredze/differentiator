@@ -92,16 +92,18 @@ static MathErr_t MathPlotMakeScript(FuncParams_t* params)
     fprintf(fp,
 R"(set terminal pdf
 set output "graphics.pdf"
-set title "Function analysis graphics"
+set title "График анализа функции"
 set xlabel "X"
 set ylabel "Y"
 set grid
 set xrange [%lg:%lg]
 set yrange [%lg:%lg]
+set key opaque
+set key box
 
-plot "graphic.txt" index 0 with linespoints lt rgb "red" pt 0 ps 0.5 title "Function", \
-"graphic.txt" index 1 with linespoints lt rgb "green" pt 0 ps 0.5 title "Derivative", \
-"graphic.txt" index 2 with linespoints lt rgb "blue" pt 0 ps 0.5 title "Taylor Series")",
+plot "graphic.txt" index 0 with linespoints lt rgb "red" pt 0 ps 0.5 title "Функция", \
+"graphic.txt" index 1 with linespoints lt rgb "green" pt 0 ps 0.5 title "Производная", \
+"graphic.txt" index 2 with linespoints lt rgb "blue" pt 0 ps 0.5 title "Ряд Тейлора")",
     params->x_left, params->x_right,
     params->y_left, params->y_right);
 
