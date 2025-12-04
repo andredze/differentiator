@@ -249,3 +249,24 @@ static MathErr_t MathPutDataInVarTable(MathCtx_t* math_ctx, const char* var_str)
 }
 
 //------------------------------------------------------------------------------------------
+
+MathErr_t MathGetVarIndex(MathCtx_t* math_ctx, const char* str_var, size_t* var_ind)
+{
+    assert(math_ctx != NULL);
+    assert(str_var  != NULL);
+    assert(var_ind  != NULL);
+
+    for (size_t i = 0; i < math_ctx->vars.size; i++)
+    {
+        if (strcmp(str_var, math_ctx->vars.data[i].str) == 0)
+        {
+            *var_ind = i;
+            return MATH_SUCCESS;
+        }
+    }
+
+    PRINTERR("Variable \"%s\" is not in table", str_var);
+    return MATH_INVALID_INPUT;
+}
+
+//------------------------------------------------------------------------------------------

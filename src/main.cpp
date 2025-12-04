@@ -24,7 +24,9 @@ int main()
         if (MathCtxCtor(&math_ctx, 0))
             break;
 
-        if (TreeReadInputData(&math_ctx))
+        FuncParams_t params = {};
+
+        if (TreeReadInputData(&math_ctx, &params))
             break;
 
         if (MathSimplify(&math_ctx))
@@ -40,7 +42,7 @@ int main()
         if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
-        if (MathDifferentiate(&math_ctx, &diff_math_ctx, "x"))
+        if (MathDifferentiate(&math_ctx, &diff_math_ctx, params.diff_var))
             break;
 
         if (MathSimplify(&diff_math_ctx))
@@ -49,12 +51,15 @@ int main()
         if (MathVarsTableDump(&diff_math_ctx, "diff vars table"))
             break;
 
+        if (math_ctx.vars.size != 1)
+            break;
+
         MathTexChapter("Разложение в ряд Тейлора");
 
         if (MathCtxCtor(&taylor_math_ctx, 0))
             break;
 
-        if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, "x", 2, 0.0))
+        if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, &params))
             break;
 
     } while (0);

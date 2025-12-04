@@ -32,6 +32,8 @@ TreeErr_t TreeGraphDump        (MathCtx_t*       math_ctx);
 void      SetGraphFilepaths    ();
 TreeErr_t TreeConvertGraphFile ();
 
+TreeErr_t TreeGraphDumpSubtree(MathCtx_t* math_ctx, TreeNode_t* node);
+
 void      DumpGraphTitle      (FILE* dot_file);
 void      TreeNodePrint       (const TreeNode_t* node          );
 TreeErr_t TreeNodeDump        (const TreeNode_t* node, FILE* fp, MathCtx_t* math_ctx);

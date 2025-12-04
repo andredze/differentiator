@@ -29,11 +29,28 @@ typedef struct MathContext
     Tree_t tree;
     Vars_t vars;
     int    dump_values;
-
-    char   plot_file_name[MAX_FILE_NAME_LEN];
-    FILE*  plot_fp;
-
 } MathCtx_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+const size_t MAX_VAR_NAME_LEN = 128;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef struct FuncParams
+{
+    char   diff_var[MAX_VAR_NAME_LEN];
+
+    double taylor_point;
+    int    taylor_degree;
+
+    double x_left;
+    double x_right;
+
+    double y_left;
+    double y_right;
+
+} FuncParams_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

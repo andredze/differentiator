@@ -24,12 +24,12 @@ typedef enum MathDataType
 
 typedef enum MathOperations
 {
-    OP_ADD,  OP_SUB,  OP_MUL, OP_DIV,
+    OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
     OP_LOG,  OP_LN,
     OP_DEG,  OP_EXP,  OP_SQRT,
-    OP_SIN,  OP_COS,  OP_TG,  OP_CTG,
-    OP_SH,   OP_CH,   OP_TH,  OP_CTH,
-    OP_ASIN, OP_ACOS, OP_ATG, OP_ACTG,
+    OP_SIN,  OP_COS,  OP_TG,   OP_CTG,
+    OP_SH,   OP_CH,   OP_TH,   OP_CTH,
+    OP_ASIN, OP_ACOS, OP_ATG,  OP_ACTG,
     OP_UNKNOWN
 } MathOp_t;
 

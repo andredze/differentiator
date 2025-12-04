@@ -11,10 +11,11 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t TreeReadInputData (MathCtx_t* math_ctx);
+MathErr_t TreeReadInputData(MathCtx_t* math_ctx, FuncParams_t* params);
 
 MathErr_t TreeReadData      (MathCtx_t*     math_ctx,
-                             const char*    data_file_path);
+                             const char*    data_file_path,
+                             FuncParams_t*  params);
 
 int       ReadFile          (FILE*          fp,
                              char**         buffer_ptr,

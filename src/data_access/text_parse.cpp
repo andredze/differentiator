@@ -399,7 +399,6 @@ static TreeNode_t* GetString(MathCtx_t* math_ctx, Expr_t* expr)
 
 static TreeNode_t* GetU(MathCtx_t* math_ctx, Expr_t* expr, char* word_start_p, size_t word_len)
 {
-
 //     uint64_t hash = GetHash();
 //
 //     op_ptr = bsearch();

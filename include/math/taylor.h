@@ -14,9 +14,24 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathGetTaylorSeries(MathCtx_t* math_ctx, MathCtx_t* taylor_ctx,
-                              const char* str_var, int last_diff_degree,
-                              double point);
+typedef struct SeriesCtx
+{
+    MathCtx_t*    original_ctx;
+    MathCtx_t*    prev_deriv_ctx;
+    MathCtx_t*    curr_deriv_ctx;
+    MathCtx_t*    taylor_ctx;
+
+    int           diff_degree;
+    FuncParams_t* params;
+
+    TreeNode_t*   node;
+
+} SeriesCtx_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+MathErr_t MathGetTaylorSeries(MathCtx_t*    math_ctx, MathCtx_t* taylor_ctx,
+                              FuncParams_t* params);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
