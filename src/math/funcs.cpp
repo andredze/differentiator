@@ -110,11 +110,29 @@ TreeNode_t* MathNodeCtor(MathCtx_t* math_ctx, MathData_t data, TreeNode_t* left,
 
 //------------------------------------------------------------------------------------------
 
+TreeNode_t* MathVarNodeCtor(MathCtx_t* math_ctx, size_t var_index)
+{
+    assert(math_ctx != NULL);
+
+    return MathNodeCtor(math_ctx, {TYPE_VAR, { .var = var_index }}, NULL, NULL);
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeNode_t* MathNumberNodeCtor(MathCtx_t* math_ctx, double number)
+{
+    assert(math_ctx != NULL);
+
+    return MathNodeCtor(math_ctx, {TYPE_NUM, { .num = number }}, NULL, NULL);
+}
+
+//------------------------------------------------------------------------------------------
+
 TreeNode_t* MathUnaryOpNodeCtor(MathCtx_t* math_ctx, MathOp_t op, TreeNode_t* right)
 {
     assert(math_ctx != NULL);
 
-    return MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = op  }}, NULL, right);
+    return MathNodeCtor(math_ctx, {TYPE_OP, { .op  = op }}, NULL, right);
 }
 
 //------------------------------------------------------------------------------------------
@@ -124,7 +142,7 @@ TreeNode_t* MathBinaryOpNodeCtor(MathCtx_t*  math_ctx, MathOp_t    op,
 {
     assert(math_ctx != NULL);
 
-    return MathNodeCtor(math_ctx, {TYPE_OP,  { .op  = op  }}, left, right);
+    return MathNodeCtor(math_ctx, {TYPE_OP, { .op = op }}, left, right);
 }
 
 //------------------------------------------------------------------------------------------

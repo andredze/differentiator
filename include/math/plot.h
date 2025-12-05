@@ -12,6 +12,7 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+MathErr_t MathPlotDumpPoint         (MathCtx_t*    math_ctx, FuncParams_t* params);
 MathErr_t MathPlotDumpPoints        (MathCtx_t*    math_ctx, FuncParams_t* params);
 MathErr_t MathPlotConvertGraphic    (FuncParams_t* params);
 

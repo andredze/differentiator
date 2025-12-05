@@ -2,15 +2,12 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-#define NUM_(number)       MathNodeCtor(taylor_ctx, {TYPE_NUM, { .num = (number) }}, NULL, NULL)
-
-#define VAR_(var_index)    MathNodeCtor(taylor_ctx, {TYPE_VAR, { .var = var_index }}, NULL, NULL)
-
-#define ADD_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_ADD }}, (lnode), (rnode))
-#define SUB_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_SUB }}, (lnode), (rnode))
-#define MUL_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_MUL }}, (lnode), (rnode))
-#define DIV_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_DIV }}, (lnode), (rnode))
-#define DEG_(lnode, rnode) MathNodeCtor(taylor_ctx, {TYPE_OP,  { .op  = OP_DEG }}, (lnode), (rnode))
+#define VAR_(var_index)    MathVarNodeCtor     (taylor_ctx, (var_index))
+#define NUM_(number)       MathNumberNodeCtor  (taylor_ctx, (number))
+#define ADD_(lnode, rnode) MathBinaryOpNodeCtor(taylor_ctx, OP_ADD, (lnode), (rnode))
+#define SUB_(lnode, rnode) MathBinaryOpNodeCtor(taylor_ctx, OP_SUB, (lnode), (rnode))
+#define MUL_(lnode, rnode) MathBinaryOpNodeCtor(taylor_ctx, OP_MUL, (lnode), (rnode))
+#define DEG_(lnode, rnode) MathBinaryOpNodeCtor(taylor_ctx, OP_DEG, (lnode), (rnode))
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -195,7 +192,7 @@ static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx, int tex_dump
                             DEG_(SUB_(VAR_(0), NUM_(series_ctx->params->taylor_point)),
                                  NUM_(series_ctx->diff_degree)));
 
-    MathTexSection("%d член разложения в ряд", series_ctx->diff_degree + 1);
+    MathTexSection("%d-й член разложения в ряд", series_ctx->diff_degree + 1);
     MathTexDumpSubtree(node, series_ctx->taylor_ctx);
 
     return node;
@@ -206,10 +203,9 @@ static TreeNode_t* MathTaylorAddElemToTree(SeriesCtx_t* series_ctx, int tex_dump
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #undef NUM_
-
 #undef VAR_
-
 #undef ADD_
+#undef SUB_
 #undef MUL_
 #undef DEG_
 

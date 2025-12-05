@@ -156,8 +156,6 @@ void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* 
     TexOpenFormula();
     fprintf(fp, R"(\frac{d}{d%s})""(", math_ctx->vars.data[0].str);
 
-    // TODO: как не терять переменные??? нужно передавать еще и src_mathctx????
-
     MathTexDumpNode(node, math_ctx);
 
     fprintf(fp, ") = ");
@@ -502,6 +500,9 @@ MathErr_t MathTexGraphic(MathCtx_t* math_ctx,        MathCtx_t*    diff_math_ctx
         return error;
 
     if ((error = MathPlotDumpPoints(taylor_math_ctx, params)))
+        return error;
+
+    if ((error = MathPlotDumpPoint (taylor_math_ctx, params)))
         return error;
 
     if ((error = MathPlotConvertGraphic(params)))

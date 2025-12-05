@@ -24,7 +24,7 @@ static int gl_tex_dump = 0;
 #define typeL node->left->data.type
 #define typeR node->right->data.type
 
-#define NUM_(number)       MathNodeCtor(math_ctx, {TYPE_NUM, { .num = (number) }}, NULL, NULL)
+#define NUM_(number)       MathNumberNodeCtor  (math_ctx, (number))
 
 #define ADD_(lnode, rnode) MathBinaryOpNodeCtor(math_ctx, OP_ADD, (lnode), (rnode))
 #define SUB_(lnode, rnode) MathBinaryOpNodeCtor(math_ctx, OP_SUB, (lnode), (rnode))
@@ -43,6 +43,8 @@ static int gl_tex_dump = 0;
 
 #define EXP_(node)         DEG_(NUM_(EULER_NUMBER), (node))
 #define SQR_(node)         DEG_((node), NUM_(2))
+
+#define CMPD_(node)        MUL_(node, dR)
 
 /* ====================================================================================== */
 
@@ -84,24 +86,24 @@ DECLARE_MATH_DIFF_OPER(Sub,  ( SUB_(dL, dR) ));
 DECLARE_MATH_DIFF_OPER(Mul,  ( ADD_(MUL_(dL, cR), MUL_(cL, dR)) ));
 DECLARE_MATH_DIFF_OPER(Div,  ( DIV_(SUB_(MUL_(dL, cR), MUL_(cL, dR)), SQR_(cR)) ));
 
-DECLARE_MATH_DIFF_OPER(Ln,   ( MUL_(DIV_(NUM_(1), cR), dR) ));
-DECLARE_MATH_DIFF_OPER(Exp,  ( MUL_(cN, dR) ));
-DECLARE_MATH_DIFF_OPER(Sqrt, ( DIV_(dR, MUL_(NUM_(2), SQRT_(cR))) ));
+DECLARE_MATH_DIFF_OPER(Ln,   ( CMPD_(DIV_(NUM_(1), cR)) ));
+DECLARE_MATH_DIFF_OPER(Exp,  ( CMPD_(cN) ));
+DECLARE_MATH_DIFF_OPER(Sqrt, ( CMPD_(DIV_(NUM_(1), MUL_(NUM_(2), SQRT_(cR)))) ));
 
-DECLARE_MATH_DIFF_OPER(Sin,  ( MUL_(COS_(cR), dR) ));
-DECLARE_MATH_DIFF_OPER(Cos,  ( MUL_(MUL_(SIN_(cR), NUM_(-1)), dR) ));
-DECLARE_MATH_DIFF_OPER(Tg,   ( MUL_(DIV_(NUM_(1), SQR_(COS_(cR))), dR) ));
-DECLARE_MATH_DIFF_OPER(Ctg,  ( MUL_(DIV_(NUM_(-1), SQR_(SIN_(cR))), dR) ));
+DECLARE_MATH_DIFF_OPER(Sin,  ( CMPD_(COS_(cR)) ));
+DECLARE_MATH_DIFF_OPER(Cos,  ( CMPD_(MUL_(NUM_(-1), SIN_(cR))) ));
+DECLARE_MATH_DIFF_OPER(Tg,   ( CMPD_(DIV_(NUM_(1),  SQR_(COS_(cR)))) ));
+DECLARE_MATH_DIFF_OPER(Ctg,  ( CMPD_(DIV_(NUM_(-1), SQR_(SIN_(cR)))) ));
 
-DECLARE_MATH_DIFF_OPER(Sh,   ( MUL_(CH_(cR), dR)) );
-DECLARE_MATH_DIFF_OPER(Ch,   ( MUL_(SH_(cR), dR) ));
-DECLARE_MATH_DIFF_OPER(Th,   ( MUL_(DIV_(NUM_(1), SQR_(CH_(cR))), dR) ));
-DECLARE_MATH_DIFF_OPER(Cth,  ( MUL_(DIV_(NUM_(-1), SQR_(SH_(cR))), dR) ));
+DECLARE_MATH_DIFF_OPER(Sh,   ( CMPD_(CH_(cR)) ));
+DECLARE_MATH_DIFF_OPER(Ch,   ( CMPD_(SH_(cR)) ));
+DECLARE_MATH_DIFF_OPER(Th,   ( CMPD_(DIV_(NUM_(1),  SQR_(CH_(cR)))) ));
+DECLARE_MATH_DIFF_OPER(Cth,  ( CMPD_(DIV_(NUM_(-1), SQR_(SH_(cR)))) ));
 
-DECLARE_MATH_DIFF_OPER(Asin, ( DIV_(dR, SQRT_(SUB_(NUM_(1), SQR_(cR))))) );
-DECLARE_MATH_DIFF_OPER(Acos, ( MUL_(NUM_(-1), DIV_(dR, SQRT_(SUB_(NUM_(1), SQR_(cR)))))) );
-DECLARE_MATH_DIFF_OPER(Atg,  ( DIV_(dR, ADD_(NUM_(1), SQR_(cR)))) );
-DECLARE_MATH_DIFF_OPER(Actg, ( MUL_(NUM_(-1), DIV_(dR, ADD_(NUM_(1), SQR_(cR))))) );
+DECLARE_MATH_DIFF_OPER(Asin, ( CMPD_(DIV_(NUM_(1),  SQRT_(SUB_(NUM_(1), SQR_(cR))))) ));
+DECLARE_MATH_DIFF_OPER(Acos, ( CMPD_(DIV_(NUM_(-1), SQRT_(SUB_(NUM_(1), SQR_(cR))))) ));
+DECLARE_MATH_DIFF_OPER(Atg,  ( CMPD_(DIV_(NUM_(1),  ADD_(NUM_(1), SQR_(cR)))) ));
+DECLARE_MATH_DIFF_OPER(Actg, ( CMPD_(DIV_(NUM_(-1), ADD_(NUM_(1), SQR_(cR)))) ));
 
 //------------------------------------------------------------------------------------------
 

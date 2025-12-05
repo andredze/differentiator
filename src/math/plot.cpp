@@ -11,6 +11,51 @@ static void      MathPlotRunScript ();
 
 //------------------------------------------------------------------------------------------
 
+MathErr_t MathPlotDumpPoint(MathCtx_t* math_ctx, FuncParams_t* params)
+{
+    assert(math_ctx != NULL);
+    assert(params   != NULL);
+
+    DPRINTF("DUMPING POINT FOR PLOT\n");
+
+    FILE* fp = fopen(GRAPHIC_FILE_NAME, graphs_count == 0 ? "w" : "a");
+
+    if (fp == NULL)
+    {
+        PRINTERR("Opening file %s failed", GRAPHIC_FILE_NAME);
+        return MATH_FILE_ERROR;
+    }
+
+    MathErr_t error = MATH_SUCCESS;
+
+    size_t var_ind = 0;
+
+    if ((error = MathGetVarIndex(math_ctx, params->diff_var, &var_ind)))
+        return error;
+
+    double y = 0.0;
+
+    if ((error = MathVarSetValue(math_ctx, params->taylor_point, var_ind)))
+        return error;
+
+    if ((error = MathEvaluateWSetValues(math_ctx, &y, 0)))
+        return error;
+
+    fprintf(fp, "%lg %lg\n", params->taylor_point, y);
+
+    fprintf(fp, "\n\n\n");
+
+    fclose(fp);
+
+    graphs_count++;
+
+    DPRINTF("DUMPED POINT FOR PLOT\n");
+
+    return MATH_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
 MathErr_t MathPlotDumpPoints(MathCtx_t* math_ctx, FuncParams_t* params)
 {
     assert(math_ctx != NULL);
@@ -104,7 +149,8 @@ set key box
 
 plot "graphic.txt" index 0 with linespoints lt rgb "red" pt 0 ps 0.5 title "Функция", \
 "graphic.txt" index 1 with linespoints lt rgb "green" pt 0 ps 0.5 title "Производная", \
-"graphic.txt" index 2 with linespoints lt rgb "blue" pt 0 ps 0.5 title "Ряд Тейлора")",
+"graphic.txt" index 2 with linespoints lt rgb "blue" pt 0 ps 0.5 title "Ряд Тейлора", \
+"graphic.txt" index 3 with linespoints lt rgb "black" pt 1 ps 1.0)",
     params->x_left, params->x_right,
     params->y_left, params->y_right);
 
