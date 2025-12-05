@@ -6,6 +6,7 @@
 #include "diff.h"
 #include "simplify.h"
 #include "taylor.h"
+#include "tangent.h"
 #include "plot.h"
 
 //------------------------------------------------------------------------------------------
@@ -15,6 +16,7 @@ int main()
     MathCtx_t math_ctx        = {};
     MathCtx_t diff_math_ctx   = {};
     MathCtx_t taylor_math_ctx = {};
+    MathCtx_t tangent_ctx     = {};
 
     TreeOpenLogFile();
     MathOpenTexFile();
@@ -55,13 +57,20 @@ int main()
         if (MathGetTaylorSeries(&math_ctx, &taylor_math_ctx, &params))
             break;
 
-        if (MathTexGraphic(&math_ctx, &diff_math_ctx, &taylor_math_ctx, &params))
+        if (MathCtxCtor(&tangent_ctx, 0))
+            break;
+
+        if (MathGetTangent(&math_ctx, &diff_math_ctx, params.taylor_point, &tangent_ctx, 1))
+            break;
+
+        if (MathTexGraphic(&math_ctx, &diff_math_ctx, &taylor_math_ctx, &tangent_ctx, &params))
             break;
 
     } while (0);
 
     MathCtxDtor(&taylor_math_ctx);
     MathCtxDtor(&diff_math_ctx);
+    MathCtxDtor(&tangent_ctx);
     MathCtxDtor(&math_ctx);
 
     TreeCloseLogFile();

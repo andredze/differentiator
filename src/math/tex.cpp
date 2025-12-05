@@ -7,19 +7,19 @@
 static void TexDumpTitle    ();
 static void TexDumpEnding   ();
 static void TexConvertToPdf ();
-static void TexOpenFormula ();
-static void TexCloseFormula();
+static void TexOpenFormula  ();
+static void TexCloseFormula ();
 
+static int  MathNodeMatchesOp           (TreeNode_t* node, MathOp_t   op);
 static void MathTexDumpNode             (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpNodeInorder      (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpNodePreorderCase (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpUnaryOp          (TreeNode_t* node, MathCtx_t* math_ctx);
 static void MathTexDumpData             (MathData_t  data, MathCtx_t* math_ctx);
-static void MathTexDumpBracketIfNeeded  (TreeNode_t* node, char bracket);
-static void MathTexDumpBraceIfNeeded    (TreeNode_t* node, char bracket);
-static void MathTexDumpNumber           (double num);
-static int  MathNodeMatchesOp           (TreeNode_t* node, MathOp_t op);
-static void MathTexVariables            (MathCtx_t* math_ctx);
+static void MathTexDumpBracketIfNeeded  (TreeNode_t* node, char       bracket);
+static void MathTexDumpBraceIfNeeded    (TreeNode_t* node, char       bracket);
+static void MathTexDumpNumber           (double      num);
+static void MathTexVariables            (MathCtx_t*  math_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -161,6 +161,19 @@ void MathTexDumpDiffSubtree(TreeNode_t* node, TreeNode_t* diff_node, MathCtx_t* 
     fprintf(fp, ") = ");
 
     MathTexDumpNode(diff_node, math_ctx);
+
+    TexCloseFormula();
+}
+
+//------------------------------------------------------------------------------------------
+
+void MathTexDumpFuncSubtree(TreeNode_t* node, MathCtx_t* math_ctx)
+{
+    TexOpenFormula();
+
+    fprintf(fp, "f(%s) = ", math_ctx->vars.data[0].str);
+
+    MathTexDumpNode(node, math_ctx);
 
     TexCloseFormula();
 }
@@ -483,8 +496,9 @@ static void MathTexDumpNumber(double num)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathTexGraphic(MathCtx_t* math_ctx,        MathCtx_t*    diff_math_ctx,
-                         MathCtx_t* taylor_math_ctx, FuncParams_t* params)
+MathErr_t MathTexGraphic(MathCtx_t* math_ctx,        MathCtx_t* diff_math_ctx,
+                         MathCtx_t* taylor_math_ctx, MathCtx_t* tangent_ctx,
+                         FuncParams_t* params)
 {
     assert(taylor_math_ctx != NULL);
     assert(diff_math_ctx   != NULL);
@@ -500,6 +514,9 @@ MathErr_t MathTexGraphic(MathCtx_t* math_ctx,        MathCtx_t*    diff_math_ctx
         return error;
 
     if ((error = MathPlotDumpPoints(taylor_math_ctx, params)))
+        return error;
+
+    if ((error = MathPlotDumpPoints(tangent_ctx, params)))
         return error;
 
     if ((error = MathPlotDumpPoint (taylor_math_ctx, params)))

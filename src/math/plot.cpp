@@ -150,7 +150,8 @@ set key box
 plot "graphic.txt" index 0 with linespoints lt rgb "red" pt 0 ps 0.5 title "Функция", \
 "graphic.txt" index 1 with linespoints lt rgb "green" pt 0 ps 0.5 title "Производная", \
 "graphic.txt" index 2 with linespoints lt rgb "blue" pt 0 ps 0.5 title "Ряд Тейлора", \
-"graphic.txt" index 3 with linespoints lt rgb "black" pt 1 ps 1.0)",
+"graphic.txt" index 3 with linespoints lt rgb "orange" pt 0 ps 0.5 title "Касательная", \
+"graphic.txt" index 4 with points lt rgb "black" pt 7 ps 0.35 notitle)",
     params->x_left, params->x_right,
     params->y_left, params->y_right);
 
