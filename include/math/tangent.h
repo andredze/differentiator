@@ -10,7 +10,7 @@
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 MathErr_t MathGetTangent(MathCtx_t* math_ctx, MathCtx_t* diff_math_ctx,
-                         double     point,    MathCtx_t* tangent_ctx, int is_dump_enabled);
+                         double     point,    MathCtx_t* tangent_ctx);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

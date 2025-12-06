@@ -1,9 +1,5 @@
 #include "diff.h"
 
-//------------------------------------------------------------------------------------------
-
-static int gl_tex_dump = 0;
-
 /* ==================== Domain Specific Language for differentiation ==================== */
 
 // lnode means left_node
@@ -143,7 +139,7 @@ TreeNode_t* (* const MATH_DIFF_OPER_TABLE[]) (MathCtx_t*, TreeNode_t*, size_t, M
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var, int tex_dump)
+MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var)
 {
     assert(dest_math_ctx != NULL);
     assert(src_math_ctx  != NULL);
@@ -151,7 +147,7 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
 
     DEBUG_TREE_CHECK(src_math_ctx, "MATH_DIFF");
 
-    if (tex_dump)
+    if (dest_math_ctx->is_dump_enabled)
     {
         MathTexSection("Дифференцирование");
         MathTexMessage("Очевидно, что");
@@ -169,8 +165,6 @@ MathErr_t MathDifferentiate(MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, c
         return error;
 
     size_t var_index = 0;
-
-    gl_tex_dump = tex_dump;
 
     TreeNode_t* root = MathDiffNode(dest_math_ctx, src_math_ctx->tree.dummy->right,
                                     var_index,     src_math_ctx);
@@ -218,7 +212,7 @@ static TreeNode_t* MathDiffNode(MathCtx_t* math_ctx, TreeNode_t* node,
             return NULL;
     }
 
-    if (gl_tex_dump)
+    if (math_ctx->is_dump_enabled)
         MathTexDumpDiffSubtree(node, new_node, math_ctx);
 
     return new_node;

@@ -38,7 +38,9 @@ MathErr_t MathPlotDumpPoint(MathCtx_t* math_ctx, FuncParams_t* params)
     if ((error = MathVarSetValue(math_ctx, params->taylor_point, var_ind)))
         return error;
 
-    if ((error = MathEvaluateWSetValues(math_ctx, &y, 0)))
+    math_ctx->is_dump_enabled = 0;
+
+    if ((error = MathEvaluateWSetValues(math_ctx, &y)))
         return error;
 
     fprintf(fp, "%lg %lg\n", params->taylor_point, y);
@@ -75,6 +77,8 @@ MathErr_t MathPlotDumpPoints(MathCtx_t* math_ctx, FuncParams_t* params)
 
     size_t var_ind = 0;
 
+    math_ctx->is_dump_enabled = 0;
+
     if ((error = MathGetVarIndex(math_ctx, params->diff_var, &var_ind)))
         return error;
 
@@ -85,7 +89,7 @@ MathErr_t MathPlotDumpPoints(MathCtx_t* math_ctx, FuncParams_t* params)
         if ((error = MathVarSetValue(math_ctx, x, var_ind)))
             return error;
 
-        if ((error = MathEvaluateWSetValues(math_ctx, &y, 0)))
+        if ((error = MathEvaluateWSetValues(math_ctx, &y)))
             return error;
 
         DPRINTF("x = %lg; y = %lg\n", x, y);

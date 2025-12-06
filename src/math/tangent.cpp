@@ -11,8 +11,7 @@
 //------------------------------------------------------------------------------------------
 
 MathErr_t MathGetTangent(MathCtx_t* math_ctx, MathCtx_t* diff_math_ctx,
-                         double     point,    MathCtx_t* tangent_ctx,
-                         int        is_dump_enabled)
+                         double     point,    MathCtx_t* tangent_ctx)
 {
     assert(math_ctx      != NULL);
     assert(diff_math_ctx != NULL);
@@ -29,20 +28,20 @@ MathErr_t MathGetTangent(MathCtx_t* math_ctx, MathCtx_t* diff_math_ctx,
     if ((error = MathVarSetValue(math_ctx, point, 0)))
         return error;
 
-    if ((error = MathEvaluateWSetValues(math_ctx, &value_in_point, 1)))
+    if ((error = MathEvaluateWSetValues(math_ctx, &value_in_point)))
         return error;
 
     if ((error = MathVarSetValue(diff_math_ctx, point, 0)))
         return error;
 
-    if ((error = MathEvaluateWSetValues(diff_math_ctx, &k_in_point, 1)))
+    if ((error = MathEvaluateWSetValues(diff_math_ctx, &k_in_point)))
         return error;
 
     tangent_ctx->tree.dummy->right = ADD_(MUL_(NUM_(k_in_point),
                                                SUB_(VAR_(0), NUM_(point))),
                                           NUM_(value_in_point));
 
-    if (is_dump_enabled)
+    if (tangent_ctx->is_dump_enabled)
     {
         MathTexChapter        ("Касательная к графику");
         MathTexDumpFuncSubtree(tangent_ctx->tree.dummy->right, tangent_ctx);

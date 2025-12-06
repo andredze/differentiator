@@ -37,7 +37,7 @@ MathErr_t MathEvaluate(MathCtx_t* math_ctx, double* presult)
 
 //------------------------------------------------------------------------------------------
 
-MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult, int tex_dump)
+MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult)
 {
     assert(math_ctx != NULL);
     assert(presult  != NULL);
@@ -51,7 +51,7 @@ MathErr_t MathEvaluateWSetValues(MathCtx_t* math_ctx, double* presult, int tex_d
 
     *presult = result;
 
-    if (tex_dump)
+    if (math_ctx->is_dump_enabled)
         MathTexEval(math_ctx, *presult);
 
     return MATH_SUCCESS;

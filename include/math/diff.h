@@ -11,7 +11,7 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
-MathErr_t MathDifferentiate (MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var, int tex_dump);
+MathErr_t MathDifferentiate (MathCtx_t* src_math_ctx, MathCtx_t* dest_math_ctx, const char* str_var);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

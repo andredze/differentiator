@@ -13,10 +13,10 @@
 
 int main()
 {
-    MathCtx_t math_ctx        = {};
-    MathCtx_t diff_math_ctx   = {};
-    MathCtx_t taylor_math_ctx = {};
-    MathCtx_t tangent_ctx     = {};
+    MathCtx_t math_ctx        = { .is_dump_enabled = 1 };
+    MathCtx_t diff_math_ctx   = { .is_dump_enabled = 1 };
+    MathCtx_t taylor_math_ctx = { .is_dump_enabled = 1 };
+    MathCtx_t tangent_ctx     = { .is_dump_enabled = 1 };
 
     TreeOpenLogFile();
     MathOpenTexFile();
@@ -32,7 +32,7 @@ int main()
         if (TreeReadInputData(&math_ctx, &params))
             break;
 
-        if (MathSimplify(&math_ctx, 1))
+        if (MathSimplify(&math_ctx))
             break;
 
         MathTexChapter("Первая производная");
@@ -40,10 +40,10 @@ int main()
         if (MathCtxCtor(&diff_math_ctx, 0))
             break;
 
-        if (MathDifferentiate(&math_ctx, &diff_math_ctx, params.diff_var, 1))
+        if (MathDifferentiate(&math_ctx, &diff_math_ctx, params.diff_var))
             break;
 
-        if (MathSimplify(&diff_math_ctx, 1))
+        if (MathSimplify(&diff_math_ctx))
             break;
 
         if (math_ctx.vars.size != 1)
@@ -60,7 +60,7 @@ int main()
         if (MathCtxCtor(&tangent_ctx, 0))
             break;
 
-        if (MathGetTangent(&math_ctx, &diff_math_ctx, params.taylor_point, &tangent_ctx, 1))
+        if (MathGetTangent(&math_ctx, &diff_math_ctx, params.taylor_point, &tangent_ctx))
             break;
 
         if (MathTexGraphic(&math_ctx, &diff_math_ctx, &taylor_math_ctx, &tangent_ctx, &params))
