@@ -46,6 +46,9 @@ int main()
         if (MathSimplify(&diff_math_ctx))
             break;
 
+        MathTexSection("Конечная формула");
+        MathTexDumpDiffSubtree(math_ctx.tree.dummy->right, diff_math_ctx.tree.dummy->right, &math_ctx);
+
         if (math_ctx.vars.size != 1)
             break;
 

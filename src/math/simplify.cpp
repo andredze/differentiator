@@ -105,8 +105,8 @@ static MathErr_t MathDeleteNeutralNode(TreeNode_t* node, MathCtx_t* math_ctx)
 
 static MathErr_t MathProcessNeutrals(TreeNode_t* node, MathCtx_t* math_ctx)
 {
-    assert(node     != NULL);
     assert(math_ctx != NULL);
+    assert(node     != NULL);
 
     if (node->data.type != TYPE_OP)
     {
